@@ -86,7 +86,7 @@ function toDateTime(time: string): Date {
 
 function toDate(date: string): Date {
   const [y, m, d] = date.split("-").map(Number)
-  const r = new Date(Date.UTC(y, m, d, 0, 0))
+  const r = new Date(Date.UTC(y, m - 1, d, 0, 0))
   return r
 }
 
@@ -148,9 +148,9 @@ export async function POST(req: Request) {
       ModifiedDate: new Date(),
     }
 
-    const res = await prisma.b2C_ChannelProcessWorkingSetup.create({ data: jsonParse })
+    // const res = await prisma.b2C_ChannelProcessWorkingSetup.create({ data: jsonParse })
 
-    // const res = jsonParse
+    const res = jsonParse
     console.log("[Server] - POST:success-channel-process-working:", res)
     // const res = { status: "success-channel-table : post", data: body.Brand }
 

@@ -402,6 +402,9 @@ export default function CreateChannelDialog({ table }: IReqCreateChannelDialog) 
                     className="bg-background pr-10"
                     onChange={() => { }}
                     onKeyDown={(e) => {
+
+                      console.log(monthForm)
+
                       if (e.key === "ArrowDown") {
                         e.preventDefault()
                         setOpenDateFrom(true)
@@ -431,7 +434,7 @@ export default function CreateChannelDialog({ table }: IReqCreateChannelDialog) 
                         className="z-[55]"
                         mode="single"
                         selected={new Date(formData.StartDate)}
-                        captionLayout="label"
+                        captionLayout="dropdown"
                         month={monthForm}
                         onMonthChange={setMonthForm}
                         onSelect={(selected) => {
@@ -498,7 +501,7 @@ export default function CreateChannelDialog({ table }: IReqCreateChannelDialog) 
                         className="z-[55]"
                         mode="single"
                         selected={dateTo}
-                        captionLayout="label"
+                        captionLayout="dropdown"
                         month={monthForm}
                         onMonthChange={setMonthForm}
                         onSelect={(selected) => {
