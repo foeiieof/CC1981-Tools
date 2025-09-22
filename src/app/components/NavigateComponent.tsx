@@ -11,6 +11,8 @@ export default function NavComponent() {
     { name: 'Home', href: '/' },
     { name: 'Employee', href: '/employee' },
     { name: 'Campaign', href: '/campaign' },
+    { name: 'Shopee', href: '/shopee' },
+    { name: 'TikTok', href: '/tiktok' },
     { name: 'Tools', href: '/tools' },
     { name: 'Sign in', href: '/register' },
     { name: 'Sign up', href: '/login' }

@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className={`${nunitoMono.variable} antialiased`} >
         <NavComponent />
         {children}
-        <Toaster position="top-center" />
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );
