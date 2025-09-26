@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Download, FileCheck2, HardDriveUpload, Search } from "lucide-react"
+import useSWR from "swr"
 import {
   Select,
   SelectContent,
@@ -27,14 +28,46 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-import { useEffect, useState } from 'react'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
+import { useEffect, useMemo, useState } from 'react'
 import { IResponse } from "../api/utility"
 import { IResShopeeTokenDetail } from "../api/shopee/shop/[shopID]/route"
 import { Spinner } from "@/components/ui/shadcn-io/spinner"
 import { toast } from "sonner"
-import { IResShopee_GetShippingDoc_Struct } from "../api/shopee/order/route"
+import { EnumShopee_GetOrderList, IResShopee_GetOrderList_Struct, IResShopee_GetShippingDoc_Struct } from "../api/shopee/order/route"
 
 import { IResShopeeShopList } from "../api/shopee/shop/route"
+import { DataTable } from "./_components/DataTable"
+import { ShopeeOrderDetailsColumn } from "./_components/columns"
+import { ShopeeOrderRequestBody } from "../api/shopee/order/details/route"
+
+//demo - data table 
+// async function getData(): Promise<Payment[]> {
+//   return [
+//     {
+//       id: "728ed52f",
+//       amount: 100,
+//       status: "pending",
+//       email: "m@example.com",
+//     }
+//   ]
+// }
+
+// old way to fetch Order
+// async function FetchShopeeOrderWithStatus(): Promise<Record<string, { count: number, data: IResShopee_GetOrderList_Struct[] }> | null> {
+//   try {
+//     const res = await fetch(`/api/shopee/order`, { cache: 'default', next: { revalidate: 10 } })
+//     const data: IResponse<Record<string, { count: number, data: IResShopee_GetOrderList_Struct[] }> | null> = await res.json()
+//     return data.data ?? null
+//   } catch {
+//     return null
+//   }
+// }
 
 async function FetchShopeeShop(): Promise<IResShopeeShopList[] | null> {
   try {
@@ -107,10 +140,28 @@ async function FetchShopeeLogisticShipDocFileByOrderSN(order: string[], shopID: 
   }
 }
 
+// function RefreshButton() {
+//   const [isPending, startTransition] = useTransition()
+
+//   return (
+//     <button
+//       onClick={() => startTransition(() => revalidatePath("/"))}
+//       disabled={isPending}
+//     >
+//       {isPending ? "Refreshing..." : "Refresh Data"}
+//     </button>
+//   )
+// }
+
+// type IReqShopeeOrderWithDetailsAndState = { order_list: ShopeeOrderRequestBody }
+const fetcherOrder = ([url, method]: [string, string]) => fetch(url, { method: method ?? "GET", cache: "force-cache", }).then(r => r.json())
+const fetcherOrderWithDetails = ([url, method, body]: [string, string, string]) => fetch(url, { method: method, cache: "force-cache", body: body }).then(r => r.json())
+
+// core fun page
 export default function ShopeePage() {
   const [isLoadData, setIsLoadData] = useState(false)
 
-  const [shopSelect, setShopSelect] = useState<IResShopeeShopList[]>()
+  // const [shopSelect, setShopSelect] = useState<IResShopeeShopList[]>()
 
   const [shopeeShopSelect, setShopeeShopSelect] = useState<string>("")
   const [shopeeAccess, setShopeeAccesss] = useState<IResShopeeTokenDetail>()
@@ -120,15 +171,104 @@ export default function ShopeePage() {
   const [resOrderDoc, setResOrderDoc] = useState<IResShopee_GetShippingDoc_Struct[]>([])
   const [availableResOrderDoc, setAvailableResOrderDoc] = useState<string[]>([])
 
-  useEffect(() => {
-    const fetchShop = async () => {
-      const shop = await FetchShopeeShop()
-      if (shop != null) {
-        setShopSelect(shop)
-      }
+  const [activeTab, setActiveTab] = useState(EnumShopee_GetOrderList.UNPAID)
+  const [orderStore, setOrderStore] = useState<ShopeeOrderRequestBody>({})
+
+  // const getFetchOrderDetails =
+  //   !!activeTab &&
+  //   !!orderStore &&
+  //   Array.isArray(orderStore[activeTab as EnumShopee_GetOrderList]) &&
+  //   (orderStore[activeTab as EnumShopee_GetOrderList]?.length ?? 0) > 0;
+
+
+  // const [data, setData] = useState<Payment[]>([])
+  // const [dataOrderListWithCatagory, setOrderListWithCatagory] = useState<Record<string, { count: number, data: IResShopee_GetOrderList_Struct[] }> | null>(null)
+
+  // const [data, mutate, isLoading] = useSWR(`/api/shopee/order`, fetcher, { revalidateOnFocus: true })
+  const { data: dataOrderListWithCatagory, mutate: orderMutate, isLoading } = useSWR<IResponse<Record<string, { count: number, data: IResShopee_GetOrderList_Struct[] }>>>(
+    ["/api/shopee/order", "GET"],
+    fetcherOrder,
+    {
+      // refreshInterval: 36000,
+      revalidateOnReconnect: true,
+      revalidateOnFocus: false,
+      refreshInterval: 0
     }
-    fetchShop()
-  }, [])
+  )
+
+  // shop access_token
+  const { data: shopSelect, mutate: shopSelectMutate, isLoading: shopSelectIsLoading } = useSWR(
+    ["/api/shopee/shop", "GET"],
+    async ([url, method]) => {
+      const res = await fetch(url, { method, cache: "force-cache" })
+      const parse = (await res.json()) as IResponse<IResShopeeShopList[]>
+      return parse.data
+    },
+    {
+      refreshInterval: 0
+    }
+  )
+
+
+
+  const shouldFetchOrderDetails =
+    !!activeTab &&
+    !!orderStore &&
+    Array.isArray(orderStore[activeTab as EnumShopee_GetOrderList]) &&
+    orderStore[activeTab as EnumShopee_GetOrderList]!.length > 0;
+
+  const orderListPayload = useMemo(() => {
+    if (!shouldFetchOrderDetails) return null;
+    return JSON.stringify({
+      order_list: {
+        [activeTab as EnumShopee_GetOrderList]: orderStore[activeTab]
+      }
+    });
+  }, [activeTab, orderStore[activeTab], shouldFetchOrderDetails]);
+
+
+  const { data: dataOrderListWithDetails, mutate: orderDetailsMutate, isLoading: isOrderDetailsLoading } = useSWR(
+    shouldFetchOrderDetails && orderListPayload
+      ? ["/api/shopee/order/details", orderListPayload]
+      : null, // key null → SWR ไม่ fetch
+    ([url, bodyString]) =>
+      fetch(url, { method: "POST", cache: "force-cache", body: bodyString }).then(r => r.json()),
+    {
+      revalidateOnReconnect: true,
+      revalidateOnFocus: true,
+    }
+  );
+
+  // const { data: dataOrderListWithDetails, mutate: orderDetailsMutate, isLoading: isOrderDetailsLoading } =
+  //   useSWR(
+  //     shouldFetch ? ["/api/shopee/order/details", orderListPayload] : null,
+  //     ([url, bodyString]) => fetch(url, { method: "POST", cache: "force-cache", body: bodyString }).then(r => r.json())
+  //   );
+  // useSWR(
+  //   getFetchOrderDetails ?
+  //     ["/api/shopee/order/details", "POST", orderListPayload]
+  //     : null,
+  //   fetcherOrderWithDetails,
+  //   {
+  //     // refreshInterval: 36000,
+  //     revalidateOnReconnect: true,
+  //     // revalidateOnFocus: true,
+  //   }
+  // )
+
+  // useEffect(() => {
+  //   const fetchShop = async () => {
+  //     // const data = await getData()
+  //     // if (data != null) setData(data)
+
+  //     const shop = await FetchShopeeShop()
+  //     if (shop != null) setShopSelect(shop)
+
+  //     // const order = await FetchShopeeOrderWithStatus()
+  //     // if (order != null) setOrderListWithCatagory(order)
+  //   }
+  //   fetchShop()
+  // }, [])
 
   useEffect(() => {
     // select shop and fetch
@@ -141,6 +281,79 @@ export default function ShopeePage() {
       fetchAccess()
     }
   }, [shopeeShopSelect])
+
+
+  useEffect(() => {
+    //   && shopSelect != undefined) {
+    // if (!shopSelect || shopSelect.length === 0) return;
+    if (dataOrderListWithCatagory && shopSelect != undefined) {
+      // const fetchAccess = async () => {
+      const newStore: ShopeeOrderRequestBody = { ...orderStore }
+      Object.entries(dataOrderListWithCatagory.data ?? {}).map(([state, { count, data }]) => {
+        const status = state as EnumShopee_GetOrderList
+        newStore[status] ??= []
+        data.forEach(i => {
+          const shopID = i.shop_id ?? "unknown"
+          // console.log(`data - i :${JSON.stringify(i)}`)
+          const access = shopSelect?.find(o => (o.ShopID === shopID))
+          // console.log(`data :${JSON.stringify(shopSelect) + "+" + shopID}`)
+          // console.log(`access - ${JSON.stringify(access)}`)
+          let entry = newStore[status]?.find(i => i.shop_id === shopID)
+          if (!entry) {
+            entry = {
+              shop_id: i.shop_id ?? "",
+              access_token: access?.AccessToken ?? "",
+              order_sn_list: [i.order_sn]
+            }
+            newStore[status]?.push(entry)
+          }
+          entry.order_sn_list.push(i.order_sn)
+        })
+      })
+      setOrderStore(newStore)
+      // }
+      // fetchAccess()
+    }
+    // }
+
+  }, [dataOrderListWithCatagory, shopSelect])
+
+  useEffect(() => {
+    if (!dataOrderListWithCatagory) return;
+    if (!shopSelect || shopSelect.length === 0) return; // 👈 ป้องกัน
+
+    const newStore: ShopeeOrderRequestBody = { ...orderStore };
+
+    Object.entries(dataOrderListWithCatagory.data ?? {}).forEach(([state, { data }]) => {
+      const status = state as EnumShopee_GetOrderList;
+      newStore[status] ??= [];
+
+      data.forEach(i => {
+        const access = shopSelect.find(o => o.ShopID === i.shop_id);
+        if (!access) {
+          console.warn(`⚠️ Access not found for shop_id: ${i.shop_id}`);
+          return; // 👈 ข้ามถ้าไม่เจอ access
+        }
+
+        let entry = newStore[status]?.find(e => e.shop_id === i.shop_id);
+        if (!entry) {
+          entry = {
+            shop_id: i.shop_id ?? "",
+            access_token: access.AccessToken ?? "",
+            order_sn_list: [],
+          };
+          newStore[status]?.push(entry);
+        }
+
+        // กัน order_sn ซ้ำ
+        if (!entry.order_sn_list.includes(i.order_sn)) {
+          entry.order_sn_list.push(i.order_sn);
+        }
+      });
+    });
+
+    setOrderStore(newStore);
+  }, [dataOrderListWithCatagory, shopSelect]);
 
   // fn-btn
   async function SeachSubmit() {
@@ -233,7 +446,7 @@ export default function ShopeePage() {
   return (
 
     <div className="font-sans grid items-start justify-items-center p-8 pb-20 sm:p-20">
-      <main className="w-full  flex flex-col gap-[32px] h-[80vh] row-start-2 justify-center items-center">
+      <main className="w-full  flex flex-col gap-[32px] h-[80vh] row-start-2 justify-start items-center">
 
         {isLoadData ? (
           <>
@@ -383,6 +596,56 @@ export default function ShopeePage() {
 
           }
         </div>
+
+        <Tabs
+          onValueChange={(val) => {
+            setActiveTab(val as EnumShopee_GetOrderList)
+          }}
+          defaultValue="UNPAID"
+          className="w-full">
+          <TabsList className="grid w-full grid-cols-7">
+            {Object.values(EnumShopee_GetOrderList).map(e => {
+              const cc = dataOrderListWithCatagory?.data != null ? dataOrderListWithCatagory.data[e] : null
+              return (
+                <TabsTrigger key={e} value={e.toString()}>
+                  <span>{e.toString()}</span>
+                  <div className={`w-fit h-fit px-[6px] text-center font-bold text-[10px] bg-zinc-200 rounded-full ${activeTab === e ? "text-black" : "text-white"}`}>
+                    {cc?.count}
+                  </div>
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
+
+          {
+            Object.values(EnumShopee_GetOrderList).map(state => {
+              // const data = dataOrderListWithCatagory?.data != null ? dataOrderListWithCatagory.data[state] : null
+              const data = dataOrderListWithDetails?.data != null
+                && dataOrderListWithDetails.data[state] != null
+                ? dataOrderListWithDetails.data[state] : null
+              if (data?.data === undefined) { return }
+              return (
+                <TabsContent key={state} value={state}>
+                  <DataTable columns={ShopeeOrderDetailsColumn} data={data?.data} />
+                </TabsContent>
+              )
+            })
+          }
+        </Tabs>
+        <div>
+          <Button onClick={() => orderMutate()}>{isLoading ? "Loading..." : "Refresh new!"}</Button>
+        </div>
+
+        <div>
+          <Button onClick={() => console.log(`orderStore - ${JSON.stringify(dataOrderListWithDetails)} \n`)}>log - detail </Button>
+
+          <Button onClick={() => console.log(`orderStore - ${JSON.stringify(orderStore)} \n`)}>Check - storeOrder</Button>
+
+          <Button onClick={() => orderDetailsMutate()}>Check - storeOrder</Button>
+
+          <Button onClick={() => console.log(JSON.stringify(shopSelect))}>Check - shopSelect</Button>
+        </div>
+
 
       </main >
     </div >

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import type ResponseInit from "url"
 
 export type IResponse<T> = {
   status: number;
   data?: T;
+  count_data?: number
   message: string;
   error?: string;
   total_page?: number;
@@ -22,6 +22,7 @@ export class ResponseHandle {
     const res: IResponse<T> = {
       status: (status ?? 200),
       data,
+      count_data: Array.isArray(data) ? data.length : undefined,
       message,
       total_page: total,
       current_page: page
