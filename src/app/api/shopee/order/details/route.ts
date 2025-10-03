@@ -47,8 +47,8 @@ export interface IResShopee_GetOrderWithDetailsList_Struct {
   total_amount: number
   payment_method: string
   item_list: IResShopee_GetOrderWithDetailsList_Struct_ItemList[]
-  create_time: Date
-  update_time: Date
+  create_time: Date | number
+  update_time: Date | number
   pickup_done_time: Date
   shop_id?: string
 }
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
         // resStore ??= []
         const bath = orderSNList.slice(i, i + bathSize)
         url.searchParams.set("order_sn_list", bath.join(","))
-        const res = await FetchShopeeGetOrderWithDetailsList(url.toString())
+        // const res = await FetchShopeeGetOrderWithDetailsList(url.toString())
         // if (res && res?.error != "") { console.log(`[Error]-[POST]-FetchShopeeGetOrderWithDetailsList : ${res?.message}`) }
 
         tasks.push(FetchShopeeGetOrderWithDetailsList(url.toString()))

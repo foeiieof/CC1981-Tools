@@ -94,11 +94,11 @@ export class OrderV202309Api {
      * Get the detailed order information of an order, including important attributes such as order status, shipping addresses, payment details, price and tax info, and package information.
      * @summary GetOrderDetail
      * @param ids A list of TikTok Shop order ID values. Max count: 50
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
-     * @param shopCipher 
      */
-    public async OrdersGet (ids: Array<string>, xTtsAccessToken: string, contentType: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Order202309GetOrderDetailResponse;  }> {
+    public async OrdersGet (ids: Array<string>, shopCipher: string, xTtsAccessToken: string, contentType: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Order202309GetOrderDetailResponse;  }> {
         const localVarPath = this.basePath + '/order/202309/orders';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -114,6 +114,11 @@ export class OrderV202309Api {
         // verify required parameter 'ids' is not null or undefined
         if (ids === null || ids === undefined) {
             throw new Error('Required parameter ids was null or undefined when calling OrdersGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling OrdersGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined
@@ -185,15 +190,15 @@ export class OrderV202309Api {
      * Returns a list of orders created or updated during the timeframe indicated by the specified parameters. You can also apply a range of filtering criteria to narrow the list of orders returned, such as order status, delivery option type, and buyer user ID.
      * @summary GetOrderList
      * @param pageSize The number of results to be returned per page. Default: 20. Valid range: [1-100].
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param sortOrder The sort order for the &#x60;sort_field&#x60; parameter. Default: DESC Possible values: - ASC: Ascending order - DESC: Descending order
      * @param pageToken An opaque token used to retrieve the next page of a paginated result set. Retrieve this value from the result of the &#x60;next_page_token&#x60; from a previous response. It is not needed for the first page.
      * @param sortField The returned results will be sorted by the specified field.  Default: &#x60;create_time&#x60; Possible values: - &#x60;create_time&#x60; - &#x60;update_time&#x60;  Specify the order for sorting the returned results by using the &#x60;sort_order&#x60; parameter.
-     * @param shopCipher 
      * @param GetOrderListRequestBody 
      */
-    public async OrdersSearchPost (pageSize: number, xTtsAccessToken: string, contentType: string, sortOrder?: string, pageToken?: string, sortField?: string, shopCipher?: string, GetOrderListRequestBody?: Order202309GetOrderListRequestBody, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Order202309GetOrderListResponse;  }> {
+    public async OrdersSearchPost (pageSize: number, shopCipher: string, xTtsAccessToken: string, contentType: string, sortOrder?: string, pageToken?: string, sortField?: string, GetOrderListRequestBody?: Order202309GetOrderListRequestBody, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Order202309GetOrderListResponse;  }> {
         const localVarPath = this.basePath + '/order/202309/orders/search';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -209,6 +214,11 @@ export class OrderV202309Api {
         // verify required parameter 'pageSize' is not null or undefined
         if (pageSize === null || pageSize === undefined) {
             throw new Error('Required parameter pageSize was null or undefined when calling OrdersSearchPost.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling OrdersSearchPost.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined

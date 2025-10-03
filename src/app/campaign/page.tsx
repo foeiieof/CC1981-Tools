@@ -11,8 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import {
-  Select,
-  SelectContent,
+  Select, SelectContent,
   SelectGroup,
   SelectItem,
   SelectLabel,
@@ -22,9 +21,7 @@ import {
 
 import { CalendarIcon } from "lucide-react"
 import { Spinner } from '@/components/ui/shadcn-io/spinner';
-
 import CampaignTable from "./components/CampaignTable";
-
 import SkeletonTable from "./components/SkeletonTable";
 import CreateChannelDialog from './components/CreateChannelDialog'
 import { B2C_ChannelProcessWorkingSetup, B2C_ChannelTable } from '@prisma/client'
@@ -77,7 +74,7 @@ async function FetchChannelProcessWorking(page?: number, size?: number, channel?
 
     const urlAPI = `/api/channel-process-working?${params.toString()}`
 
-    const res = await fetch(urlAPI, { next: { revalidate: 3600 } })
+    const res = await fetch(urlAPI, { cache: "no-cache" })
 
     const data: IResponse<B2C_ChannelProcessWorkingSetup[] | null> = await res.json()
     console.log("res:::", data)

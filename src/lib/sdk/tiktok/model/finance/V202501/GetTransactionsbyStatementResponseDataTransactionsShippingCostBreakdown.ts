@@ -59,6 +59,10 @@ export class Finance202501GetTransactionsbyStatementResponseDataTransactionsShip
     */
     'shippingFeeDiscountAmount'?: string;
     /**
+    * Reimbursement from the Shipping Fee Guarantee Program for failed deliveries or returns
+    */
+    'shippingFeeGuaranteeReimbursement'?: string;
+    /**
     * The shipping insurance fee incurred by the seller for purchasing additional TikTok shipping insurance services.
     */
     'shippingInsuranceFeeAmount'?: string;
@@ -124,6 +128,11 @@ export class Finance202501GetTransactionsbyStatementResponseDataTransactionsShip
         {
             "name": "shippingFeeDiscountAmount",
             "baseName": "shipping_fee_discount_amount",
+            "type": "string"
+        },
+        {
+            "name": "shippingFeeGuaranteeReimbursement",
+            "baseName": "shipping_fee_guarantee_reimbursement",
             "type": "string"
         },
         {

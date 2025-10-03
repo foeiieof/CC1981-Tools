@@ -1,0 +1,2 @@
+ API TTS Tracking Validation  has been added. 
+ API: Deauthorize Shop, Edit Product, Get Order Detail, Get Order Detail, Get Order List, Get Shop LIVE Performance List, Get Shop Performance, Get Shop Product Performance, Get Shop Product Performance List, Get Shop SKU Performance, Get Shop SKU Performance List, Get Shop Video Performance Details, Get Shop Video Performance List, Get Shop Video Performance Overview, Get Shop Video Product Performance List, Get Transactions by Order, Get Transactions by Statement, Partial Edit Product has been upgraded. 

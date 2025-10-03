@@ -1,26 +1,16 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Download, FileCheck2, HardDriveUpload, Search } from "lucide-react"
+import { Copy, Download, FileCheck2, HardDriveUpload, MoreHorizontal, Search } from "lucide-react"
 import useSWR from "swr"
 import {
   Select,
-  SelectContent,
-  SelectGroup,
+  SelectContent, SelectGroup,
   SelectItem,
   SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 
 import {
   Tooltip,
@@ -34,18 +24,25 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import Image from "next/image"
 import { useEffect, useMemo, useState } from 'react'
 import { IResponse } from "../api/utility"
 import { IResShopeeTokenDetail } from "../api/shopee/shop/[shopID]/route"
-import { Spinner } from "@/components/ui/shadcn-io/spinner"
 import { toast } from "sonner"
 import { EnumShopee_GetOrderList, IResShopee_GetOrderList_Struct, IResShopee_GetShippingDoc_Struct } from "../api/shopee/order/route"
-
 import { IResShopeeShopList } from "../api/shopee/shop/route"
+import { IResShopee_GetOrderWithDetailsList_Struct, IResShopee_GetOrderWithDetailsList_Struct_ItemList, ShopeeOrderRequestBody } from "../api/shopee/order/details/route"
+import SkeletonShopeeTable from "./_components/SkeletonShopeeTable"
+import { ColumnDef } from "@tanstack/react-table"
+import OrderDetailsDialog from "./_components/DialogOrderDetails"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { DataTable } from "./_components/DataTable"
-import { ShopeeOrderDetailsColumn } from "./_components/columns"
-import { ShopeeOrderRequestBody } from "../api/shopee/order/details/route"
-
 //demo - data table 
 // async function getData(): Promise<Payment[]> {
 //   return [
@@ -69,16 +66,16 @@ import { ShopeeOrderRequestBody } from "../api/shopee/order/details/route"
 //   }
 // }
 
-async function FetchShopeeShop(): Promise<IResShopeeShopList[] | null> {
-  try {
-    const res = await fetch(`/api/shopee/shop`, { cache: 'force-cache', next: { revalidate: 3600 } })
-    const data: IResponse<IResShopeeShopList[]> = await res.json()
-    return data.data ?? null
-  } catch (err) {
-    console.error(`fetch [FetchShopeeShop] : ${err}`)
-    return null
-  }
-}
+// async function FetchShopeeShop(): Promise<IResShopeeShopList[] | null> {
+//   try {
+//     const res = await fetch(`/api/shopee/shop`, { cache: 'force-cache', next: { revalidate: 3600 } })
+//     const data: IResponse<IResShopeeShopList[]> = await res.json()
+//     return data.data ?? null
+//   } catch (err) {
+//     console.error(`fetch [FetchShopeeShop] : ${err}`)
+//     return null
+//   }
+// }
 
 async function FetchShopeeShopAccessTokenByShopID(shop: string): Promise<IResShopeeTokenDetail | null> {
   try {
@@ -139,29 +136,21 @@ async function FetchShopeeLogisticShipDocFileByOrderSN(order: string[], shopID: 
     toast.error(`fetch [FetchShopeeLogisticShipDocFileByOrderSN] : ${err}`)
   }
 }
-
-// function RefreshButton() {
-//   const [isPending, startTransition] = useTransition()
-
-//   return (
-//     <button
-//       onClick={() => startTransition(() => revalidatePath("/"))}
-//       disabled={isPending}
-//     >
-//       {isPending ? "Refreshing..." : "Refresh Data"}
-//     </button>
-//   )
-// }
-
 // type IReqShopeeOrderWithDetailsAndState = { order_list: ShopeeOrderRequestBody }
 const fetcherOrder = ([url, method]: [string, string]) => fetch(url, { method: method ?? "GET", cache: "force-cache", }).then(r => r.json())
-const fetcherOrderWithDetails = ([url, method, body]: [string, string, string]) => fetch(url, { method: method, cache: "force-cache", body: body }).then(r => r.json())
 
+const fetcherOrderDetails = async (key: [string, string]) => {
+  const [url, bodyString] = key;
+  const res = await fetch(url, {
+    method: "POST",
+    cache: "force-cache",
+    body: bodyString,
+  });
+  return res.json();
+};
 // core fun page
 export default function ShopeePage() {
   const [isLoadData, setIsLoadData] = useState(false)
-
-  // const [shopSelect, setShopSelect] = useState<IResShopeeShopList[]>()
 
   const [shopeeShopSelect, setShopeeShopSelect] = useState<string>("")
   const [shopeeAccess, setShopeeAccesss] = useState<IResShopeeTokenDetail>()
@@ -174,6 +163,167 @@ export default function ShopeePage() {
   const [activeTab, setActiveTab] = useState(EnumShopee_GetOrderList.UNPAID)
   const [orderStore, setOrderStore] = useState<ShopeeOrderRequestBody>({})
 
+  const [isModalOrderDetails, setIsModalOrderDetails] = useState<boolean>(false)
+
+  const [selectOrder, setSelectOrder] = useState<IResShopee_GetOrderWithDetailsList_Struct | null>(null)
+
+  const ShopeeOrderDetailsColumn: ColumnDef<IResShopee_GetOrderWithDetailsList_Struct>[] = [
+    {
+      accessorKey: "shop_id",
+      header: "Shop ID",
+      cell: info => info.getValue() ?? "-",
+    },
+    {
+      accessorKey: "order_sn",
+      header: "Order SN",
+      cell: ({ row }) => {
+        const order = row.original
+        return (
+          <button
+            className="flex flex-row justify-center items-center gap-2 hover:bg-zinc-100  p-2 rounded-lg "
+            type="button"
+            onClick={() => {
+              toast.success(`Copy OrderSN : ${order.order_sn}`)
+              navigator.clipboard.writeText(order.order_sn)
+            }}
+          >
+            {order.order_sn}
+            <Copy size={12} />
+          </button>
+        )
+      }
+    },
+    {
+      accessorKey: "item_list",
+      header: "Item",
+      cell: info => {
+        const items = info.getValue() as IResShopee_GetOrderWithDetailsList_Struct_ItemList[];
+        const item = items[0]
+
+        if (items && items[1])
+          console.log(items[1].item_id)
+
+
+
+        return (
+          <div className="flex space-x-1">
+            <Image
+              key={`img-${item.item_id}`}
+              src={item.image_info?.image_url ?? ""}
+              alt={item.item_name}
+              height={160}
+              width={120}
+              className="h-auto w-[120px] object-cover rounded border"
+              loading="lazy"
+            // priority
+            />
+          </div>
+        );
+      }
+    },
+
+    {
+      accessorKey: "order_status",
+      header: "Order Status",
+    },
+    {
+      accessorKey: "shipping_carrier",
+      header: "Shipping Carrier",
+    },
+    {
+      accessorKey: "cod",
+      header: "COD",
+      cell: info => {
+        const data = info.getValue() ? "Yes" : "No"
+        return (<span className={`font-bold ${data === "Yes" ? " text-green-600" : "text-red-600"}`}> {data}</span>)
+      }
+    },
+    {
+      accessorKey: "total_amount",
+      header: "Total Amount",
+      cell: info => (info.getValue() as number).toLocaleString() + " ฿",
+    },
+    {
+      accessorKey: "payment_method",
+      header: "Payment Method",
+      cell: info => {
+        const data = (info.getValue() as string)
+        return (
+          <span className="max-w-16 text-balance">
+            {data}
+          </span>
+        )
+      }
+    },
+
+    {
+      accessorKey: "create_time",
+      header: "Create Time",
+      cell: info => {
+        const time = new Date(info.getValue() as number * 1000).toLocaleString("th-TH", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+        return (
+          <span>
+            {time}
+          </span>
+        )
+      },
+    },
+    {
+      accessorKey: "update_time",
+      header: "Update Time",
+      cell: info => {
+        const time = new Date(info.getValue() as number * 1000).toLocaleString("th-TH", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+        return (
+          <span>
+            {time}
+          </span>
+        )
+      },
+    },
+
+
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const order = row.original
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectOrder(order)
+                  setIsModalOrderDetails(true)
+                }}
+              >View order details</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Generate AWB</DropdownMenuItem>
+              <DropdownMenuItem>Dowload AWB</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
+    },
+  ]
+
   // const getFetchOrderDetails =
   //   !!activeTab &&
   //   !!orderStore &&
@@ -185,19 +335,19 @@ export default function ShopeePage() {
   // const [dataOrderListWithCatagory, setOrderListWithCatagory] = useState<Record<string, { count: number, data: IResShopee_GetOrderList_Struct[] }> | null>(null)
 
   // const [data, mutate, isLoading] = useSWR(`/api/shopee/order`, fetcher, { revalidateOnFocus: true })
-  const { data: dataOrderListWithCatagory, mutate: orderMutate, isLoading } = useSWR<IResponse<Record<string, { count: number, data: IResShopee_GetOrderList_Struct[] }>>>(
+  const { data: dataOrderListWithCatagory } = useSWR<IResponse<Record<string, { count: number, data: IResShopee_GetOrderList_Struct[] }>>>(
     ["/api/shopee/order", "GET"],
     fetcherOrder,
     {
       // refreshInterval: 36000,
-      revalidateOnReconnect: true,
+      // revalidateOnReconnect: true,
       revalidateOnFocus: false,
       refreshInterval: 0
     }
   )
 
   // shop access_token
-  const { data: shopSelect, mutate: shopSelectMutate, isLoading: shopSelectIsLoading } = useSWR(
+  const { data: shopSelect } = useSWR(
     ["/api/shopee/shop", "GET"],
     async ([url, method]) => {
       const res = await fetch(url, { method, cache: "force-cache" })
@@ -205,7 +355,9 @@ export default function ShopeePage() {
       return parse.data
     },
     {
-      refreshInterval: 0
+      refreshInterval: 0,
+      revalidateOnReconnect: false,
+      revalidateOnFocus: false,
     }
   )
 
@@ -224,51 +376,22 @@ export default function ShopeePage() {
         [activeTab as EnumShopee_GetOrderList]: orderStore[activeTab]
       }
     });
-  }, [activeTab, orderStore[activeTab], shouldFetchOrderDetails]);
+  }, [activeTab, orderStore, shouldFetchOrderDetails]);
 
 
-  const { data: dataOrderListWithDetails, mutate: orderDetailsMutate, isLoading: isOrderDetailsLoading } = useSWR(
-    shouldFetchOrderDetails && orderListPayload
+  const { data: dataOrderListWithDetails, isLoading: isOrderDetailsLoading } = useSWR<IResponse<Record<string, { count: number, data: IResShopee_GetOrderWithDetailsList_Struct[] }>>>(
+    orderListPayload
       ? ["/api/shopee/order/details", orderListPayload]
-      : null, // key null → SWR ไม่ fetch
-    ([url, bodyString]) =>
-      fetch(url, { method: "POST", cache: "force-cache", body: bodyString }).then(r => r.json()),
+      : null,
+    fetcherOrderDetails,
     {
-      revalidateOnReconnect: true,
-      revalidateOnFocus: true,
+      revalidateOnReconnect: false,
+      revalidateOnFocus: false,
+      refreshInterval: 0
     }
   );
 
-  // const { data: dataOrderListWithDetails, mutate: orderDetailsMutate, isLoading: isOrderDetailsLoading } =
-  //   useSWR(
-  //     shouldFetch ? ["/api/shopee/order/details", orderListPayload] : null,
-  //     ([url, bodyString]) => fetch(url, { method: "POST", cache: "force-cache", body: bodyString }).then(r => r.json())
-  //   );
-  // useSWR(
-  //   getFetchOrderDetails ?
-  //     ["/api/shopee/order/details", "POST", orderListPayload]
-  //     : null,
-  //   fetcherOrderWithDetails,
-  //   {
-  //     // refreshInterval: 36000,
-  //     revalidateOnReconnect: true,
-  //     // revalidateOnFocus: true,
-  //   }
-  // )
 
-  // useEffect(() => {
-  //   const fetchShop = async () => {
-  //     // const data = await getData()
-  //     // if (data != null) setData(data)
-
-  //     const shop = await FetchShopeeShop()
-  //     if (shop != null) setShopSelect(shop)
-
-  //     // const order = await FetchShopeeOrderWithStatus()
-  //     // if (order != null) setOrderListWithCatagory(order)
-  //   }
-  //   fetchShop()
-  // }, [])
 
   useEffect(() => {
     // select shop and fetch
@@ -289,7 +412,7 @@ export default function ShopeePage() {
     if (dataOrderListWithCatagory && shopSelect != undefined) {
       // const fetchAccess = async () => {
       const newStore: ShopeeOrderRequestBody = { ...orderStore }
-      Object.entries(dataOrderListWithCatagory.data ?? {}).map(([state, { count, data }]) => {
+      Object.entries(dataOrderListWithCatagory.data ?? {}).map(([state, { data }]) => {
         const status = state as EnumShopee_GetOrderList
         newStore[status] ??= []
         data.forEach(i => {
@@ -320,8 +443,7 @@ export default function ShopeePage() {
 
   useEffect(() => {
     if (!dataOrderListWithCatagory) return;
-    if (!shopSelect || shopSelect.length === 0) return; // 👈 ป้องกัน
-
+    if (!shopSelect || shopSelect.length === 0) return; //
     const newStore: ShopeeOrderRequestBody = { ...orderStore };
 
     Object.entries(dataOrderListWithCatagory.data ?? {}).forEach(([state, { data }]) => {
@@ -332,7 +454,7 @@ export default function ShopeePage() {
         const access = shopSelect.find(o => o.ShopID === i.shop_id);
         if (!access) {
           console.warn(`⚠️ Access not found for shop_id: ${i.shop_id}`);
-          return; // 👈 ข้ามถ้าไม่เจอ access
+          return;
         }
 
         let entry = newStore[status]?.find(e => e.shop_id === i.shop_id);
@@ -358,7 +480,7 @@ export default function ShopeePage() {
   // fn-btn
   async function SeachSubmit() {
     setResOrderDoc([])
-    setIsLoadData(true)
+    // setIsLoadData(true)
     // check param
     if (inputOrderSearch != "" && shopeeAccess != undefined && shopeeAccess.ShopID != undefined && shopeeAccess.AccessToken != undefined) {
 
@@ -442,28 +564,17 @@ export default function ShopeePage() {
     }
   }
 
+  // const dialogMemo = useMemo(() => { return <OrderDetailsDialog data={selectOrder ?? undefined} state={[isModalOrderDetails, setIsModalOrderDetails]} /> }, [selectOrder])
+
+  const orderDialog = useMemo(() => {
+    if (!selectOrder) return null
+    return <OrderDetailsDialog data={selectOrder} state={[isModalOrderDetails, setIsModalOrderDetails]} />
+  }, [selectOrder, isModalOrderDetails])
 
   return (
 
     <div className="font-sans grid items-start justify-items-center p-8 pb-20 sm:p-20">
       <main className="w-full  flex flex-col gap-[32px] h-[80vh] row-start-2 justify-start items-center">
-
-        {isLoadData ? (
-          <>
-            <AlertDialog open={isLoadData}>
-              <AlertDialogContent className="w-fit flex justify-center">
-                <AlertDialogHeader>
-                  <AlertDialogTitle></AlertDialogTitle>
-                  <AlertDialogDescription>
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <Spinner className='self-center' />
-                <AlertDialogFooter>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
-        ) : ("")}
 
         <h1> Shopee Page </h1>
         <h2> Check & Dowload AWB</h2>
@@ -618,35 +729,28 @@ export default function ShopeePage() {
           </TabsList>
 
           {
-            Object.values(EnumShopee_GetOrderList).map(state => {
-              // const data = dataOrderListWithCatagory?.data != null ? dataOrderListWithCatagory.data[state] : null
-              const data = dataOrderListWithDetails?.data != null
-                && dataOrderListWithDetails.data[state] != null
-                ? dataOrderListWithDetails.data[state] : null
-              if (data?.data === undefined) { return }
-              return (
-                <TabsContent key={state} value={state}>
-                  <DataTable columns={ShopeeOrderDetailsColumn} data={data?.data} />
-                </TabsContent>
-              )
-            })
+            isOrderDetailsLoading ? (
+              <SkeletonShopeeTable />
+            )
+              :
+              Object.values(EnumShopee_GetOrderList).map(state => {
+                const data = dataOrderListWithDetails?.data != null
+                  && dataOrderListWithDetails.data[state] != null
+                  ? dataOrderListWithDetails.data[state] : null
+                if (data?.data === undefined) { return }
+                return (
+                  <TabsContent key={state} value={state}>
+                    <DataTable
+                      data={data.data}
+                      columns={ShopeeOrderDetailsColumn} />
+                    {/* <DataTable columns={ShopeeOrderDetailsColumn} data={data?.data} /> */}
+                  </TabsContent>
+                )
+              })
           }
         </Tabs>
-        <div>
-          <Button onClick={() => orderMutate()}>{isLoading ? "Loading..." : "Refresh new!"}</Button>
-        </div>
-
-        <div>
-          <Button onClick={() => console.log(`orderStore - ${JSON.stringify(dataOrderListWithDetails)} \n`)}>log - detail </Button>
-
-          <Button onClick={() => console.log(`orderStore - ${JSON.stringify(orderStore)} \n`)}>Check - storeOrder</Button>
-
-          <Button onClick={() => orderDetailsMutate()}>Check - storeOrder</Button>
-
-          <Button onClick={() => console.log(JSON.stringify(shopSelect))}>Check - shopSelect</Button>
-        </div>
-
-
+        {orderDialog}
+        {/* <OrderDetailsDialog data={selectOrder ?? undefined} state={[isModalOrderDetails, setIsModalOrderDetails]} /> */}
       </main >
     </div >
   )

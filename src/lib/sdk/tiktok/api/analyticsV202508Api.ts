@@ -215,6 +215,7 @@ export class AnalyticsV202508Api {
      * @summary GetShopLIVEPerformanceList
      * @param startDateGe Start date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;ge\&quot; refers to \&quot;greater than or equal to\&quot; (inclusive)
      * @param endDateLt End date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;lt\&quot; refers to \&quot;less than\&quot; (exclusive)
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param pageSize Number of products per page. Max value: 100 Default value: 10
@@ -223,9 +224,8 @@ export class AnalyticsV202508Api {
      * @param currency Currency. Available values: USD, LOCAL Default value: LOCAL
      * @param pageToken Page token, indicating the current position. Used for requesting next page data. Leave this field empty for first time queries.
      * @param accountType Types of the accounts under which videos were created. Available values: ALL, OFFICIAL_ACCOUNTS, MARKETING_ACCOUNTS, AFFILIATE_ACCOUNTS Default value: ALL
-     * @param shopCipher 
      */
-    public async ShopLivesPerformanceGet (startDateGe: string, endDateLt: string, xTtsAccessToken: string, contentType: string, pageSize?: number, sortField?: string, sortOrder?: string, currency?: string, pageToken?: string, accountType?: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202508GetShopLIVEPerformanceListResponse;  }> {
+    public async ShopLivesPerformanceGet (startDateGe: string, endDateLt: string, shopCipher: string, xTtsAccessToken: string, contentType: string, pageSize?: number, sortField?: string, sortOrder?: string, currency?: string, pageToken?: string, accountType?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202508GetShopLIVEPerformanceListResponse;  }> {
         const localVarPath = this.basePath + '/analytics/202508/shop_lives/performance';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -246,6 +246,11 @@ export class AnalyticsV202508Api {
         // verify required parameter 'endDateLt' is not null or undefined
         if (endDateLt === null || endDateLt === undefined) {
             throw new Error('Required parameter endDateLt was null or undefined when calling ShopLivesPerformanceGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ShopLivesPerformanceGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined

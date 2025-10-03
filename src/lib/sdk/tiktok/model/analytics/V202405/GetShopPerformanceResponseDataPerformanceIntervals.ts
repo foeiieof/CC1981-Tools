@@ -64,11 +64,11 @@ export class Analytics202405GetShopPerformanceResponseDataPerformanceIntervals {
     */
     'productImpressions'?: number;
     /**
-    * Product page view breakdowns.
+    * The total number of views for your product detail page when viewers clicked product links for the corresponding type.
     */
     'productPageViewBreakdowns'?: Array<Analytics202405GetShopPerformanceResponseDataPerformanceIntervalsProductPageViewBreakdowns>;
     /**
-    * Total product detail page views for the shop.
+    * The total number of views for your product detail page when viewers clicked product links.
     */
     'productPageViews'?: number;
     'refunds'?: Analytics202405GetShopPerformanceResponseDataPerformanceIntervalsRefunds;

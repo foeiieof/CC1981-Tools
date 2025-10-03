@@ -93,11 +93,11 @@ export class FinanceV202501Api {
      * Retrieves the SKU-level details of an order transaction. This covers transactions related to sales, fees, commissions, shipping, taxes, and refunds. Applicable for all regions\' sellers. Only data after 2023-07-01 is available (Please note that for US cross-border sellers, data before 2025-04-30 is unavailable).
      * @summary GetTransactionsbyOrder
      * @param orderId The order ID in TikTok Shop.
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
-     * @param shopCipher 
      */
-    public async OrdersOrderIdStatementTransactionsGet (orderId: string, xTtsAccessToken: string, contentType: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Finance202501GetTransactionsbyOrderResponse;  }> {
+    public async OrdersOrderIdStatementTransactionsGet (orderId: string, shopCipher: string, xTtsAccessToken: string, contentType: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Finance202501GetTransactionsbyOrderResponse;  }> {
         const localVarPath = this.basePath + '/finance/202501/orders/{order_id}/statement_transactions'
             .replace('{' + 'order_id' + '}', encodeURIComponent(String(orderId)));
         let localVarQueryParameters: any = {};
@@ -114,6 +114,11 @@ export class FinanceV202501Api {
         // verify required parameter 'orderId' is not null or undefined
         if (orderId === null || orderId === undefined) {
             throw new Error('Required parameter orderId was null or undefined when calling OrdersOrderIdStatementTransactionsGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling OrdersOrderIdStatementTransactionsGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined
@@ -182,14 +187,14 @@ export class FinanceV202501Api {
      * @summary GetTransactionsbyStatement
      * @param statementId The unique id of statement
      * @param sortField The returned results will be sorted by the specified field. Only supports &#x60;order_create_time&#x60;.
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param pageToken An opaque token used to retrieve the next page of a paginated result set. Retrieve this value from the result of the &#x60;next_page_token&#x60; from a previous response. It is not needed for the first page.
      * @param sortOrder The sort order for the &#x60;sort_field&#x60; parameter.  Default: ASC  Possible values: - ASC: Ascending order - DESC: Descending order
      * @param pageSize The number of results to be returned per page.  Default: 20 Valid range: [1-100]
-     * @param shopCipher 
      */
-    public async StatementsStatementIdStatementTransactionsGet (statementId: string, sortField: string, xTtsAccessToken: string, contentType: string, pageToken?: string, sortOrder?: string, pageSize?: any, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Finance202501GetTransactionsbyStatementResponse;  }> {
+    public async StatementsStatementIdStatementTransactionsGet (statementId: string, sortField: string, shopCipher: string, xTtsAccessToken: string, contentType: string, pageToken?: string, sortOrder?: string, pageSize?: any, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Finance202501GetTransactionsbyStatementResponse;  }> {
         const localVarPath = this.basePath + '/finance/202501/statements/{statement_id}/statement_transactions'
             .replace('{' + 'statement_id' + '}', encodeURIComponent(String(statementId)));
         let localVarQueryParameters: any = {};
@@ -211,6 +216,11 @@ export class FinanceV202501Api {
         // verify required parameter 'sortField' is not null or undefined
         if (sortField === null || sortField === undefined) {
             throw new Error('Required parameter sortField was null or undefined when calling StatementsStatementIdStatementTransactionsGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling StatementsStatementIdStatementTransactionsGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined

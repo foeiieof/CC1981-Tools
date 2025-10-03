@@ -19,6 +19,7 @@ import { Product202309PartialEditProductRequestBodyProductAttributes } from './P
 import { Product202309PartialEditProductRequestBodyReplicatedProducts } from './PartialEditProductRequestBodyReplicatedProducts';
 import { Product202309PartialEditProductRequestBodySizeChart } from './PartialEditProductRequestBodySizeChart';
 import { Product202309PartialEditProductRequestBodySkus } from './PartialEditProductRequestBodySkus';
+import { Product202309PartialEditProductRequestBodySubscribeInfoEdit } from './PartialEditProductRequestBodySubscribeInfoEdit';
 import { Product202309PartialEditProductRequestBodyVideo } from './PartialEditProductRequestBodyVideo';
 
 export class Product202309PartialEditProductRequestBody {
@@ -77,6 +78,7 @@ export class Product202309PartialEditProductRequestBody {
     * A list of Stock Keeping Units (SKUs) used to identify distinct variants of the product.  **Note**: - Max SKUs for BR, EU, JP, MX, UK, US: 300 - Max SKUs for other regions: 100  **Recommendations**: Place the most important variant at the beginning of the array.
     */
     'skus'?: Array<Product202309PartialEditProductRequestBodySkus>;
+    'subscribeInfoEdit'?: Product202309PartialEditProductRequestBodySubscribeInfoEdit;
     /**
     * The product title.  Title length: - DE, ES, FR, IE, IT, JP, UK, US: [1, 255]  - BR, MX: [1, 300]  - Other regions: [25, 255]
     */
@@ -165,6 +167,11 @@ export class Product202309PartialEditProductRequestBody {
             "name": "skus",
             "baseName": "skus",
             "type": "Array<Product202309PartialEditProductRequestBodySkus>"
+        },
+        {
+            "name": "subscribeInfoEdit",
+            "baseName": "subscribe_info_edit",
+            "type": "Product202309PartialEditProductRequestBodySubscribeInfoEdit"
         },
         {
             "name": "title",

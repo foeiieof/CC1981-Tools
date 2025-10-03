@@ -14,7 +14,7 @@ import { RequestFile } from '../../models';
 
 export class Analytics202405GetShopPerformanceResponseDataPerformanceIntervalsProductPageViewBreakdowns {
     /**
-    * Total product detail page views for the corresponding type.
+    * The total number of views for your product detail page when viewers clicked product links for the corresponding type.
     */
     'amount'?: number;
     /**

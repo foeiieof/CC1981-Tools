@@ -20,8 +20,8 @@ export const generateSign = (
   signString += paramString;
 
   //step3: Append the string from Step 2 to the API request path:
-  // @ts-ignore
-  const pathname = new URL(requestOption!.uri! || '').pathname;
+// @ts-ignore
+  const pathname = new URL(requestOption!.uri!||'').pathname;
 
   signString = `${pathname}${paramString}`;
 

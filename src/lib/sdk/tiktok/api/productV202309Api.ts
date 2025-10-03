@@ -2617,12 +2617,12 @@ export class ProductV202309Api {
      * Edit some properties (e.g. description, images, attributes) of a product that is not in the `FREEZE` or `DELETED` state. After editing the product, the latest product content (referred to as v2) will be resent for audit review. If the audit passes, v2 is published to the shop, otherwise, the existing product stays live and remains unchanged (keeping v1). However, edits to the `price` or `inventory` fields do not require a reaudit and will be immediately published on the platform. Use the [Product status change](650956aff1fd3102b90b6261) webhook to keep track of the review status. **Note**:  - This API is applicable for all sellers. - There may be a limit to the number of products you can relist per day. We recommend prioritizing key products first to ensure they get published. You can find your listing limit on the Seller Center homepage. - If a draft or audit-review version exists, unedited fields will retain their values over those of the base (live) version. - **Updates are handled per top-level property**, so all non-empty fields within an updated object must be supplied to prevent overwriting with blanks. For top-level properties (e.g. `description`, `brand_id`) that are not nested in an object, you can update them individually. Omitting these properties in the request will leave them unchanged. If you need to edit any nested property within an object, you must provide values for all nested properties of that object. Any omitted nested properties will be overwritten with blanks. - If new mandatory product attributes were added by TikTok Shop after the creation of your product, ensure that you provide these attributes too. **For global sellers**: If you\'re using the local replication listing method, note the following sync rules: **Sales attribute changes** (in sales attribute id/name) must be synced to other markets. Therefore, you must provide the `seller_sku` and complete `replicated_products` data. The API call will fail if you don\'t provide these details. **New SKUs* (new sales attribute value id/name) are optional to sync to other markets. To sync, please provide the `seller_sku` and complete `replicated_products` data. **General changes** are optional to sync to other markets. To sync, you only need to provide `replicated_products.region`. **For Tokopedia sellers**: Note that a product can have **only one active version** across all platforms at any time. If a product is live on both platforms, audit results for the latest version are handled as follows: - **Mixed audit results**: If the product passes audit on one platform but fails on another, on the successful platform, the product will stay live and be updated with content from the latest version (v2), while on the failed platform, the product will be deactivated and hidden entirely. - **Audit failure on all platforms**: If the product fails audit on all platforms, the existing product stays live and remains unchanged (keeping v1).
      * @summary PartialEditProduct
      * @param productId The product ID in TikTok Shop.
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
-     * @param shopCipher 
      * @param PartialEditProductRequestBody 
      */
-    public async ProductsProductIdPartialEditPost (productId: string, xTtsAccessToken: string, contentType: string, shopCipher?: string, PartialEditProductRequestBody?: Product202309PartialEditProductRequestBody, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Product202309PartialEditProductResponse;  }> {
+    public async ProductsProductIdPartialEditPost (productId: string, shopCipher: string, xTtsAccessToken: string, contentType: string, PartialEditProductRequestBody?: Product202309PartialEditProductRequestBody, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Product202309PartialEditProductResponse;  }> {
         const localVarPath = this.basePath + '/product/202309/products/{product_id}/partial_edit'
             .replace('{' + 'product_id' + '}', encodeURIComponent(String(productId)));
         let localVarQueryParameters: any = {};
@@ -2639,6 +2639,11 @@ export class ProductV202309Api {
         // verify required parameter 'productId' is not null or undefined
         if (productId === null || productId === undefined) {
             throw new Error('Required parameter productId was null or undefined when calling ProductsProductIdPartialEditPost.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ProductsProductIdPartialEditPost.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined
@@ -2797,12 +2802,12 @@ export class ProductV202309Api {
      * Edit all properties (e.g. description, brand, images) of an existing product that is not in the `FREEZE` or `DELETED` state. After editing the product, the latest product content (referred to as v2) will be resent for audit review. If the audit passes, v2 is published to the shop, otherwise, the existing product stays live and remains unchanged (keeping v1). However, edits to the `price` or `inventory` fields do not require a reaudit and will be immediately published on the platform. Use the [Product status change](https://partner.tiktokshop.com/docv2/page/650956aff1fd3102b90b6261) webhook to keep track of the review status. **Note**:  - This API is applicable only for **active sellers/shops** that have completed the KYC onboarding process. - There may be a limit to the number of products you can relist per day. We recommend prioritizing key products first to ensure they get published. You can find your listing limit on the Seller Center homepage. - All inputs, including blanks, in the request payload will overwrite existing values. To retain an existing value, make sure to include it in your request. Exceptions to this rule are the `price` and `inventory` fields, which will remain unchanged if they are omitted from the request. Therefore, **it is strongly recommended to retrieve the latest product data using [Get Product](6509d85b4a0bb702c057fdda) and submit the complete data when editing**. This ensures accuracy and helps avoid errors or unintentional data loss due to missing fields. - If you wish to edit only certain properties, you can use the [Partial Edit Product API](650a98d74a0bb702c06c3289), [Update Inventory API](6503068fc20ad60284b38858), or the [Update Price API](650307de5a12ff0294eac8b0). - The language used in the product content must align with the target market\'s language (e.g. don\'t use Chinese), otherwise the listing will fail or be rejected. **For global sellers**: If you\'re using the local replication listing method, note the following sync rules: - To sync any changes to other markets, please provide the `seller_sku` and complete `replicated_products` data.  - Note that **category changes** and **sales attribute changes** (in sales attribute id/name) must be synced to other markets. The API call will fail if you don\'t provide these details. **For Tokopedia sellers**: Note that a product can have **only one active version** across all platforms at any time. If a product is live on both platforms, audit results for the latest version are handled as follows: - **Mixed audit results**: If the product passes audit on one platform but fails on another, on the successful platform, the product will stay live and be updated with content from the latest version (v2), while on the failed platform, the product will be deactivated and hidden entirely. - **Audit failure on all platforms**: If the product fails audit on all platforms, the existing product stays live and remains unchanged (keeping v1).
      * @summary EditProduct
      * @param productId The product ID generated by TikTok Shop.
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
-     * @param shopCipher 
      * @param EditProductRequestBody 
      */
-    public async ProductsProductIdPut (productId: string, xTtsAccessToken: string, contentType: string, shopCipher?: string, EditProductRequestBody?: Product202309EditProductRequestBody, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Product202309EditProductResponse;  }> {
+    public async ProductsProductIdPut (productId: string, shopCipher: string, xTtsAccessToken: string, contentType: string, EditProductRequestBody?: Product202309EditProductRequestBody, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Product202309EditProductResponse;  }> {
         const localVarPath = this.basePath + '/product/202309/products/{product_id}'
             .replace('{' + 'product_id' + '}', encodeURIComponent(String(productId)));
         let localVarQueryParameters: any = {};
@@ -2819,6 +2824,11 @@ export class ProductV202309Api {
         // verify required parameter 'productId' is not null or undefined
         if (productId === null || productId === undefined) {
             throw new Error('Required parameter productId was null or undefined when calling ProductsProductIdPut.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ProductsProductIdPut.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined

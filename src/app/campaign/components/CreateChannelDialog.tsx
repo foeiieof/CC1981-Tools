@@ -435,6 +435,8 @@ export default function CreateChannelDialog({ table }: IReqCreateChannelDialog) 
                         mode="single"
                         selected={new Date(formData.StartDate)}
                         captionLayout="dropdown"
+                        startMonth={new Date(2025, 0)}
+                        endMonth={new Date(2075, 0)}
                         month={monthForm}
                         onMonthChange={setMonthForm}
                         onSelect={(selected) => {
@@ -503,6 +505,8 @@ export default function CreateChannelDialog({ table }: IReqCreateChannelDialog) 
                         selected={dateTo}
                         captionLayout="dropdown"
                         month={monthForm}
+                        startMonth={new Date(2025, 0)}
+                        endMonth={new Date(2075, 0)}
                         onMonthChange={setMonthForm}
                         onSelect={(selected) => {
                           console.log(selected)

@@ -54,6 +54,10 @@ export class Finance202501GetTransactionsbyOrderResponseDataSkuTransactionsShipp
     */
     'sellerShippingFeeDiscountAmount'?: string;
     /**
+    * Reimbursement from the Shipping Fee Guarantee Program for failed deliveries or returns
+    */
+    'shippingFeeGuaranteeReimbursement'?: string;
+    /**
     * The shipping fee subsidy funded by the platform for seller shipping. This is part of `shipping_fee_discount_amount`. - Positive amount represents a subsidy received by the seller. - Negative amount represents a subsidy that the seller must return to TikTok Shop.
     */
     'shippingFeeSubsidyAmount'?: string;
@@ -109,6 +113,11 @@ export class Finance202501GetTransactionsbyOrderResponseDataSkuTransactionsShipp
         {
             "name": "sellerShippingFeeDiscountAmount",
             "baseName": "seller_shipping_fee_discount_amount",
+            "type": "string"
+        },
+        {
+            "name": "shippingFeeGuaranteeReimbursement",
+            "baseName": "shipping_fee_guarantee_reimbursement",
             "type": "string"
         },
         {

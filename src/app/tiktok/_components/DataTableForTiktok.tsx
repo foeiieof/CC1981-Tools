@@ -48,7 +48,7 @@ interface DataTableProps<TData, TValue> {
   }
 }
 
-export function DataTable<TData, TValue>({
+export function DataTableForTiktok<TData, TValue>({
   columns,
   data,
   state,
@@ -57,9 +57,12 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+  // const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+  //   // on_server: false
+  // })
+
   const [rowSelection, setRowSelection] = React.useState({})
+
 
   const table = useReactTable({
     data,
@@ -70,12 +73,12 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
+    // onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
-      columnVisibility,
+      columnVisibility: {},
       rowSelection,
       ...state
     },
@@ -88,11 +91,8 @@ export function DataTable<TData, TValue>({
         <Input
           placeholder="Filter ..."
           value={table.getState().globalFilter ?? ""}
-          // value={table.getState().globalFilter() ?? ""}
-          // value={(table.getAllColumns()?.filter((i) => i.id) as string) ?? ""}
           onChange={(event) =>
             table.setGlobalFilter(event.target.value)
-            // table.getColumn("email")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

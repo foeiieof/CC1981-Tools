@@ -107,7 +107,7 @@ class AccessToken {
       throw new Error("refresh_token is required");
     }
     const qs = {
-      grant_type: "refresh_token",
+      grant_type,
       refresh_token,
       app_key,
       app_secret,
@@ -227,8 +227,8 @@ class AccessTokenTool {
     app_key?: string,
     app_secret?: string
   ) {
-    const _app_key = app_key ?? ClientConfiguration.globalConfig.app_key;
-    const _app_secret = app_secret ?? ClientConfiguration.globalConfig.app_secret;
+    let _app_key = app_key || ClientConfiguration.globalConfig.app_key;
+    let _app_secret = app_secret || ClientConfiguration.globalConfig.app_secret;
     if (!_app_key) {
       throw new Error("app_key is required");
     }
@@ -242,7 +242,7 @@ class AccessTokenTool {
     const path = auth_host + refresh_token_path;
     // 请求逻辑
     const qs = {
-      grant_type: "refresh_token",
+      grant_type,
       refresh_token,
       app_key: _app_key,
       app_secret: _app_secret,
@@ -280,8 +280,8 @@ class AccessTokenTool {
     app_key?: string,
     app_secret?: string
   ) {
-    const _app_key = app_key || ClientConfiguration.globalConfig.app_key;
-    const _app_secret = app_secret || ClientConfiguration.globalConfig.app_secret;
+    let _app_key = app_key || ClientConfiguration.globalConfig.app_key;
+    let _app_secret = app_secret || ClientConfiguration.globalConfig.app_secret;
 
     if (!_app_key) {
       throw new Error("app_key is required");

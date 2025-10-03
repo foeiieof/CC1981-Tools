@@ -40,6 +40,10 @@ export class Order202507GetOrderDetailResponseDataOrdersLineItems {
     */
     'displayStatus'?: string;
     /**
+    * Retail price of the free item in orders Live giveaway, free sample and gift with purchase. For other orders, this field always returns 0. This amount can be used for free samples and live giveaway order invoice in Brazil
+    */
+    'giftRetailPrice'?: string;
+    /**
     * [**Deprecated**: This field is deprecated and will be removed in a future API version. Use `handling_duration` instead.] The number of business days required for the seller to process the order and hand it over to a shipping carrier after the order is placed.  Applicable only if the value for `sku_type` is `MADE_TO_ORDER`.
     */
     'handlingDurationDays'?: string;
@@ -75,6 +79,10 @@ export class Order202507GetOrderDetailResponseDataOrdersLineItems {
     * The package status of the item: - `TO_FULFILL`: package waiting seller to arrange shipment. - `PROCESSING`: package shipment has been arranged by seller. Waiting carrier to collect the parcel. - `FULFILLING`: package has been collected by carrier and in transit. - `COMPLETED`: package has been delivered. - `CANCELLED`: package has been canceled. Normally, the package is canceled due to the package being lost or damaged.
     */
     'packageStatus'?: string;
+    /**
+    * Deposit fee that is applied to certain products, typically beverage containers such as bottles or cans. **Note** Only available in Germany market
+    */
+    'pfandFee'?: string;
     /**
     * Platform discount amount, please refer to the currency of `payment_info`.
     */
@@ -174,6 +182,11 @@ export class Order202507GetOrderDetailResponseDataOrdersLineItems {
             "type": "string"
         },
         {
+            "name": "giftRetailPrice",
+            "baseName": "gift_retail_price",
+            "type": "string"
+        },
+        {
             "name": "handlingDurationDays",
             "baseName": "handling_duration_days",
             "type": "string"
@@ -216,6 +229,11 @@ export class Order202507GetOrderDetailResponseDataOrdersLineItems {
         {
             "name": "packageStatus",
             "baseName": "package_status",
+            "type": "string"
+        },
+        {
+            "name": "pfandFee",
+            "baseName": "pfand_fee",
             "type": "string"
         },
         {

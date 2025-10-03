@@ -22,7 +22,7 @@ export class Order202309GetOrderDetailResponseDataOrdersPayment {
     */
     'currency'?: string;
     /**
-    * A fee charged to buyers to cover the additional processing/handling costs associated with the chosen payment method. Only available in the Indonesia market.
+    * A fee charged to buyers to cover the additional processing/handling costs associated with the chosen payment method.
     */
     'handlingFee'?: string;
     /**

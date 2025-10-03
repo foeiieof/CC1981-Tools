@@ -90,10 +90,11 @@ export class AnalyticsV202406Api {
     }
 
     /**
-     * Returns a list of SKU performance metrics. This API currently provides data only for shops registered in the United States, United Kingdom, Singapore, Vietnam, and Thailand.
+     * Returns a list of SKU performance metrics.
      * @summary GetShopSKUPerformanceList
      * @param startDateGe Start time (ISO 8601 YYYY-MM-DD format) in shop registered timezone, inclusive.
      * @param endDateLt End time (ISO 8601 YYYY-MM-DD format) in shop registered timezone, exclusive.
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param pageSize Number of records per page. The maximum page_size value is 100
@@ -102,9 +103,8 @@ export class AnalyticsV202406Api {
      * @param pageToken Page token, indicating the current position. The page_token is empty by default, indicating first position.
      * @param productId Filter SKUs by product ID. If a product_id is provided, the API will only return SKUs for the given product ID, otherwise it will return all SKUs for the shop
      * @param currency Currency: - USD: US dollars - LOCAL (default): Local currency where the shop is located
-     * @param shopCipher 
      */
-    public async ShopSkusPerformanceGet (startDateGe: string, endDateLt: string, xTtsAccessToken: string, contentType: string, pageSize?: number, sortField?: string, sortOrder?: string, pageToken?: string, productId?: string, currency?: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202406GetShopSKUPerformanceListResponse;  }> {
+    public async ShopSkusPerformanceGet (startDateGe: string, endDateLt: string, shopCipher: string, xTtsAccessToken: string, contentType: string, pageSize?: number, sortField?: string, sortOrder?: string, pageToken?: string, productId?: string, currency?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202406GetShopSKUPerformanceListResponse;  }> {
         const localVarPath = this.basePath + '/analytics/202406/shop_skus/performance';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -125,6 +125,11 @@ export class AnalyticsV202406Api {
         // verify required parameter 'endDateLt' is not null or undefined
         if (endDateLt === null || endDateLt === undefined) {
             throw new Error('Required parameter endDateLt was null or undefined when calling ShopSkusPerformanceGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ShopSkusPerformanceGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined
@@ -221,19 +226,19 @@ export class AnalyticsV202406Api {
         });
     }
     /**
-     * Return SKU performance metrics. This API currently provides data only for shops registered in the United States, United Kingdom, Singapore, Vietnam, and Thailand.
+     * Return SKU performance metrics.
      * @summary GetShopSKUPerformance
-     * @param skuId 
+     * @param skuId SKU ID
      * @param startDateGe Start time (ISO 8601 YYYY-MM-DD format) in shop registered timezone, inclusive.
      * @param endDateLt End time (ISO 8601 YYYY-MM-DD format) in shop registered timezone, exclusive.
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param withComparison Whether previous period data is returned for comparison. true | false. Default value is false The previous period has the same length and granularity as the current period with end time being the same as the start time of the current period. Example: If start_date_ge &#x3D; 2024-04-01 and end_date_lt &#x3D; 2024-04-08, the previous period data will be from 2024-03-25 to 2024-04-01.
      * @param granularity Granularity of the data. Available values: ALL, 1D Default value: ALL * ALL: aggregate * 1D: daily
      * @param currency Currency: - USD: US dollars - LOCAL (default): Local currency where the shop is located
-     * @param shopCipher 
      */
-    public async ShopSkusSkuIdPerformanceGet (skuId: string, startDateGe: string, endDateLt: string, xTtsAccessToken: string, contentType: string, withComparison?: boolean, granularity?: string, currency?: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202406GetShopSKUPerformanceResponse;  }> {
+    public async ShopSkusSkuIdPerformanceGet (skuId: string, startDateGe: string, endDateLt: string, shopCipher: string, xTtsAccessToken: string, contentType: string, withComparison?: boolean, granularity?: string, currency?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202406GetShopSKUPerformanceResponse;  }> {
         const localVarPath = this.basePath + '/analytics/202406/shop_skus/{sku_id}/performance'
             .replace('{' + 'sku_id' + '}', encodeURIComponent(String(skuId)));
         let localVarQueryParameters: any = {};
@@ -260,6 +265,11 @@ export class AnalyticsV202406Api {
         // verify required parameter 'endDateLt' is not null or undefined
         if (endDateLt === null || endDateLt === undefined) {
             throw new Error('Required parameter endDateLt was null or undefined when calling ShopSkusSkuIdPerformanceGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ShopSkusSkuIdPerformanceGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined

@@ -14,8 +14,8 @@ export default function NavComponent() {
     { name: 'Shopee', href: '/shopee' },
     { name: 'TikTok', href: '/tiktok' },
     { name: 'Tools', href: '/tools' },
-    { name: 'Sign in', href: '/register' },
-    { name: 'Sign up', href: '/login' }
+    // { name: 'Sign in', href: '/register' },
+    // { name: 'Sign up', href: '/login' }
   ]
 
   const pathName = usePathname()

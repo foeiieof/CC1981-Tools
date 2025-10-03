@@ -19,6 +19,7 @@ import { Product202309EditProductRequestBodyProductAttributes } from './EditProd
 import { Product202309EditProductRequestBodyReplicatedProducts } from './EditProductRequestBodyReplicatedProducts';
 import { Product202309EditProductRequestBodySizeChart } from './EditProductRequestBodySizeChart';
 import { Product202309EditProductRequestBodySkus } from './EditProductRequestBodySkus';
+import { Product202309EditProductRequestBodySubscribeInfoEdit } from './EditProductRequestBodySubscribeInfoEdit';
 import { Product202309EditProductRequestBodyVideo } from './EditProductRequestBodyVideo';
 
 export class Product202309EditProductRequestBody {
@@ -101,6 +102,7 @@ export class Product202309EditProductRequestBody {
     * A list of Stock Keeping Units (SKUs) used to identify distinct variants of the product.  **Note**: - Max SKUs for BR, EU, MX, JP, UK, US: 300 - Max SKUs for other regions: 100  **Recommendations**: Place the most important variant at the beginning of the array.
     */
     'skus'?: Array<Product202309EditProductRequestBodySkus>;
+    'subscribeInfoEdit'?: Product202309EditProductRequestBodySubscribeInfoEdit;
     /**
     * The product title.  Title length: - DE, ES, FR, IE, IT, JP, UK, US: [1, 255]  - BR, MX: [1, 300]  - Other regions: [25, 255]
     */
@@ -219,6 +221,11 @@ export class Product202309EditProductRequestBody {
             "name": "skus",
             "baseName": "skus",
             "type": "Array<Product202309EditProductRequestBodySkus>"
+        },
+        {
+            "name": "subscribeInfoEdit",
+            "baseName": "subscribe_info_edit",
+            "type": "Product202309EditProductRequestBodySubscribeInfoEdit"
         },
         {
             "name": "title",

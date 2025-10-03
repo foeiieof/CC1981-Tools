@@ -8,25 +8,41 @@ export interface IResTiktokShopList {
   ShopName: string
   IsActive: boolean
   CipherID: string
+  AccessToken: string
+  OpenID: string
 }
 
 export async function GET() {
-  const res = await prisma.tiktok_ShopInfo.findMany()
-  if (res.length > 0) {
-    const resParse: IResTiktokShopList[] = []
-    for (const item of res) {
-      const i: IResTiktokShopList = {
-        ShopID: item.ShopId,
-        ShopName: item.ShopName,
-        IsActive: item.IsActive,
-        CipherID: item.Cipher
-      }
-      resParse.push(i)
+
+  try {
+
+    const res = await prisma.tiktok_ShopInfo.findMany()
+
+    if (res.length > 0) {
+      const shopList = await Promise.allSettled(res.map(async (item) => {
+        const access = await prisma.tikTok_AccessToken.findFirst({ where: { SellerName: item.ShopName }, orderBy: { CreationDate: "desc" } })
+        if (access === null) return ResponseHandle.error("error-tiktok-shop", "[GET]-Tiktok_ShopInfo not found", 200)
+        return {
+          ShopID: item.ShopId,
+          ShopName: item.ShopName,
+          IsActive: item.IsActive,
+          CipherID: item.Cipher,
+          AccessToken: access.AccessToken,
+          OpenID: access.OpenId
+        } as IResTiktokShopList
+      }))
+
+      const parseShop = shopList.map(i => {
+        if (i.status === "fulfilled") return i.value
+      })
+
+      return ResponseHandle.success(parseShop, "succes-tiktok-shop", 200)
     }
 
-    return ResponseHandle.success(resParse, "succes-tiktok-shop", 200)
+  } catch {
+    return ResponseHandle.error("error-tiktok-shop", "[GET]-Tiktok_ShopInfo", 400)
   }
-  return ResponseHandle.error("error-tiktok-shop", "[GET]-Tiktok_ShopInfo", 200)
+
 }
 
 

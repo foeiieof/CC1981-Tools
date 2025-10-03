@@ -148,9 +148,9 @@ export async function POST(req: Request) {
       ModifiedDate: new Date(),
     }
 
-    // const res = await prisma.b2C_ChannelProcessWorkingSetup.create({ data: jsonParse })
+    const res = await prisma.b2C_ChannelProcessWorkingSetup.create({ data: jsonParse })
 
-    const res = jsonParse
+    // const res = jsonParse
     console.log("[Server] - POST:success-channel-process-working:", res)
     // const res = { status: "success-channel-table : post", data: body.Brand }
 

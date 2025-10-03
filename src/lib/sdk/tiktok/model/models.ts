@@ -301,6 +301,8 @@ export * from './fulfillment/V202502/UploadInvoiceResponse';
 export * from './fulfillment/V202502/UploadInvoiceResponseData';
 export * from './fulfillment/V202502/UploadInvoiceResponseDataErrors';
 export * from './fulfillment/V202502/UploadInvoiceResponseDataErrorsDetail';
+export * from './fulfillment/V202508/TTSTrackingValidationResponse';
+export * from './fulfillment/V202508/TTSTrackingValidationResponseData';
 export * from './logistics/V202309/GetGlobalSellerWarehouseResponse';
 export * from './logistics/V202309/GetGlobalSellerWarehouseResponseData';
 export * from './logistics/V202309/GetGlobalSellerWarehouseResponseDataGlobalWarehouses';
@@ -531,6 +533,8 @@ export * from './product/V202309/EditProductRequestBodySkusPrice';
 export * from './product/V202309/EditProductRequestBodySkusSalesAttributes';
 export * from './product/V202309/EditProductRequestBodySkusSalesAttributesSkuImg';
 export * from './product/V202309/EditProductRequestBodySkusSalesAttributesSupplementarySkuImages';
+export * from './product/V202309/EditProductRequestBodySubscribeInfoEdit';
+export * from './product/V202309/EditProductRequestBodySubscribeInfoEditDiscountDetails';
 export * from './product/V202309/EditProductRequestBodyVideo';
 export * from './product/V202309/EditProductResponse';
 export * from './product/V202309/EditProductResponseData';
@@ -691,6 +695,8 @@ export * from './product/V202309/PartialEditProductRequestBodySkusPrice';
 export * from './product/V202309/PartialEditProductRequestBodySkusSalesAttributes';
 export * from './product/V202309/PartialEditProductRequestBodySkusSalesAttributesSkuImg';
 export * from './product/V202309/PartialEditProductRequestBodySkusSalesAttributesSupplementarySkuImages';
+export * from './product/V202309/PartialEditProductRequestBodySubscribeInfoEdit';
+export * from './product/V202309/PartialEditProductRequestBodySubscribeInfoEditDiscountDetails';
 export * from './product/V202309/PartialEditProductRequestBodyVideo';
 export * from './product/V202309/PartialEditProductResponse';
 export * from './product/V202309/PartialEditProductResponseData';
@@ -1403,6 +1409,8 @@ import { Fulfillment202502UploadInvoiceResponse } from './fulfillment/V202502/Up
 import { Fulfillment202502UploadInvoiceResponseData } from './fulfillment/V202502/UploadInvoiceResponseData';
 import { Fulfillment202502UploadInvoiceResponseDataErrors } from './fulfillment/V202502/UploadInvoiceResponseDataErrors';
 import { Fulfillment202502UploadInvoiceResponseDataErrorsDetail } from './fulfillment/V202502/UploadInvoiceResponseDataErrorsDetail';
+import { Fulfillment202508TTSTrackingValidationResponse } from './fulfillment/V202508/TTSTrackingValidationResponse';
+import { Fulfillment202508TTSTrackingValidationResponseData } from './fulfillment/V202508/TTSTrackingValidationResponseData';
 import { Logistics202309GetGlobalSellerWarehouseResponse } from './logistics/V202309/GetGlobalSellerWarehouseResponse';
 import { Logistics202309GetGlobalSellerWarehouseResponseData } from './logistics/V202309/GetGlobalSellerWarehouseResponseData';
 import { Logistics202309GetGlobalSellerWarehouseResponseDataGlobalWarehouses } from './logistics/V202309/GetGlobalSellerWarehouseResponseDataGlobalWarehouses';
@@ -1633,6 +1641,8 @@ import { Product202309EditProductRequestBodySkusPrice } from './product/V202309/
 import { Product202309EditProductRequestBodySkusSalesAttributes } from './product/V202309/EditProductRequestBodySkusSalesAttributes';
 import { Product202309EditProductRequestBodySkusSalesAttributesSkuImg } from './product/V202309/EditProductRequestBodySkusSalesAttributesSkuImg';
 import { Product202309EditProductRequestBodySkusSalesAttributesSupplementarySkuImages } from './product/V202309/EditProductRequestBodySkusSalesAttributesSupplementarySkuImages';
+import { Product202309EditProductRequestBodySubscribeInfoEdit } from './product/V202309/EditProductRequestBodySubscribeInfoEdit';
+import { Product202309EditProductRequestBodySubscribeInfoEditDiscountDetails } from './product/V202309/EditProductRequestBodySubscribeInfoEditDiscountDetails';
 import { Product202309EditProductRequestBodyVideo } from './product/V202309/EditProductRequestBodyVideo';
 import { Product202309EditProductResponse } from './product/V202309/EditProductResponse';
 import { Product202309EditProductResponseData } from './product/V202309/EditProductResponseData';
@@ -1793,6 +1803,8 @@ import { Product202309PartialEditProductRequestBodySkusPrice } from './product/V
 import { Product202309PartialEditProductRequestBodySkusSalesAttributes } from './product/V202309/PartialEditProductRequestBodySkusSalesAttributes';
 import { Product202309PartialEditProductRequestBodySkusSalesAttributesSkuImg } from './product/V202309/PartialEditProductRequestBodySkusSalesAttributesSkuImg';
 import { Product202309PartialEditProductRequestBodySkusSalesAttributesSupplementarySkuImages } from './product/V202309/PartialEditProductRequestBodySkusSalesAttributesSupplementarySkuImages';
+import { Product202309PartialEditProductRequestBodySubscribeInfoEdit } from './product/V202309/PartialEditProductRequestBodySubscribeInfoEdit';
+import { Product202309PartialEditProductRequestBodySubscribeInfoEditDiscountDetails } from './product/V202309/PartialEditProductRequestBodySubscribeInfoEditDiscountDetails';
 import { Product202309PartialEditProductRequestBodyVideo } from './product/V202309/PartialEditProductRequestBodyVideo';
 import { Product202309PartialEditProductResponse } from './product/V202309/PartialEditProductResponse';
 import { Product202309PartialEditProductResponseData } from './product/V202309/PartialEditProductResponseData';
@@ -2508,6 +2520,8 @@ let typeMap: {[index: string]: any} = {
     "Fulfillment202502UploadInvoiceResponseData": Fulfillment202502UploadInvoiceResponseData,
     "Fulfillment202502UploadInvoiceResponseDataErrors": Fulfillment202502UploadInvoiceResponseDataErrors,
     "Fulfillment202502UploadInvoiceResponseDataErrorsDetail": Fulfillment202502UploadInvoiceResponseDataErrorsDetail,
+    "Fulfillment202508TTSTrackingValidationResponse": Fulfillment202508TTSTrackingValidationResponse,
+    "Fulfillment202508TTSTrackingValidationResponseData": Fulfillment202508TTSTrackingValidationResponseData,
     "Logistics202309GetGlobalSellerWarehouseResponse": Logistics202309GetGlobalSellerWarehouseResponse,
     "Logistics202309GetGlobalSellerWarehouseResponseData": Logistics202309GetGlobalSellerWarehouseResponseData,
     "Logistics202309GetGlobalSellerWarehouseResponseDataGlobalWarehouses": Logistics202309GetGlobalSellerWarehouseResponseDataGlobalWarehouses,
@@ -2738,6 +2752,8 @@ let typeMap: {[index: string]: any} = {
     "Product202309EditProductRequestBodySkusSalesAttributes": Product202309EditProductRequestBodySkusSalesAttributes,
     "Product202309EditProductRequestBodySkusSalesAttributesSkuImg": Product202309EditProductRequestBodySkusSalesAttributesSkuImg,
     "Product202309EditProductRequestBodySkusSalesAttributesSupplementarySkuImages": Product202309EditProductRequestBodySkusSalesAttributesSupplementarySkuImages,
+    "Product202309EditProductRequestBodySubscribeInfoEdit": Product202309EditProductRequestBodySubscribeInfoEdit,
+    "Product202309EditProductRequestBodySubscribeInfoEditDiscountDetails": Product202309EditProductRequestBodySubscribeInfoEditDiscountDetails,
     "Product202309EditProductRequestBodyVideo": Product202309EditProductRequestBodyVideo,
     "Product202309EditProductResponse": Product202309EditProductResponse,
     "Product202309EditProductResponseData": Product202309EditProductResponseData,
@@ -2898,6 +2914,8 @@ let typeMap: {[index: string]: any} = {
     "Product202309PartialEditProductRequestBodySkusSalesAttributes": Product202309PartialEditProductRequestBodySkusSalesAttributes,
     "Product202309PartialEditProductRequestBodySkusSalesAttributesSkuImg": Product202309PartialEditProductRequestBodySkusSalesAttributesSkuImg,
     "Product202309PartialEditProductRequestBodySkusSalesAttributesSupplementarySkuImages": Product202309PartialEditProductRequestBodySkusSalesAttributesSupplementarySkuImages,
+    "Product202309PartialEditProductRequestBodySubscribeInfoEdit": Product202309PartialEditProductRequestBodySubscribeInfoEdit,
+    "Product202309PartialEditProductRequestBodySubscribeInfoEditDiscountDetails": Product202309PartialEditProductRequestBodySubscribeInfoEditDiscountDetails,
     "Product202309PartialEditProductRequestBodyVideo": Product202309PartialEditProductRequestBodyVideo,
     "Product202309PartialEditProductResponse": Product202309PartialEditProductResponse,
     "Product202309PartialEditProductResponseData": Product202309PartialEditProductResponseData,

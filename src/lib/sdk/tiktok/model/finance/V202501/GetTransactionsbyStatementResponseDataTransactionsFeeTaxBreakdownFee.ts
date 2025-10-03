@@ -82,6 +82,10 @@ export class Finance202501GetTransactionsbyStatementResponseDataTransactionsFeeT
     */
     'flashSalesServiceFeeAmount'?: string;
     /**
+    * The fee TikTok Shop charges you for using platform installation service
+    */
+    'installationServiceFee'?: string;
+    /**
     * The service fee charged for participation in the [LIVE Specials Programme].
     */
     'liveSpecialsFeeAmount'?: string;
@@ -113,6 +117,10 @@ export class Finance202501GetTransactionsbyStatementResponseDataTransactionsFeeT
     * The service fee charged for participation in the [Seller Free Shipping Programme].
     */
     'sfpServiceFeeAmount'?: string;
+    /**
+    * A flat service fee charged for each order under the Shipping Fee Guarantee Program
+    */
+    'shippingFeeGuaranteeServiceFee'?: string;
     /**
     * The advertising commission cost a merchant pays to TikTok Shop Affiliate Partner (TAP).
     */
@@ -223,6 +231,11 @@ export class Finance202501GetTransactionsbyStatementResponseDataTransactionsFeeT
             "type": "string"
         },
         {
+            "name": "installationServiceFee",
+            "baseName": "installation_service_fee",
+            "type": "string"
+        },
+        {
             "name": "liveSpecialsFeeAmount",
             "baseName": "live_specials_fee_amount",
             "type": "string"
@@ -260,6 +273,11 @@ export class Finance202501GetTransactionsbyStatementResponseDataTransactionsFeeT
         {
             "name": "sfpServiceFeeAmount",
             "baseName": "sfp_service_fee_amount",
+            "type": "string"
+        },
+        {
+            "name": "shippingFeeGuaranteeServiceFee",
+            "baseName": "shipping_fee_guarantee_service_fee",
             "type": "string"
         },
         {

@@ -92,11 +92,11 @@ export class OrderV202507Api {
      * Get the detailed order information of an order, including important attributes such as order status, shipping addresses, payment details, price and tax info, and package information.
      * @summary GetOrderDetail
      * @param ids A list of TikTok Shop order ID values. Max count: 50
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
-     * @param shopCipher 
      */
-    public async OrdersGet (ids: Array<string>, xTtsAccessToken: string, contentType: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Order202507GetOrderDetailResponse;  }> {
+    public async OrdersGet (ids: Array<string>, shopCipher: string, xTtsAccessToken: string, contentType: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Order202507GetOrderDetailResponse;  }> {
         const localVarPath = this.basePath + '/order/202507/orders';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -112,6 +112,11 @@ export class OrderV202507Api {
         // verify required parameter 'ids' is not null or undefined
         if (ids === null || ids === undefined) {
             throw new Error('Required parameter ids was null or undefined when calling OrdersGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling OrdersGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined

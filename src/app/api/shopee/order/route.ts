@@ -116,7 +116,7 @@ async function ShopeeGetOrderList({ shopID, accessToken, from, to, cursor, statu
 }
 
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   // get shop data
   const excludes = [
     "358708695",
@@ -185,7 +185,13 @@ export async function GET(req: NextRequest) {
 
     const promiseShopList = Object.values(shopListAccessResult).map(async (s) => {
       const promiseList = Object.values(EnumShopee_GetOrderList)
-        // .filter(i => i != "CANCELLED" && i != "COMPLETED" && i != "PROCESSED" && i != "SHIPPED" && i != "READY_TO_SHIP" && i != "IN_CANCEL")
+        .filter(i => i != EnumShopee_GetOrderList.CANCELLED
+          && i != EnumShopee_GetOrderList.UNPAID
+          && i != EnumShopee_GetOrderList.COMPLETED
+          && i != EnumShopee_GetOrderList.SHIPPED
+          && i != EnumShopee_GetOrderList.PROCESSED
+          && i != EnumShopee_GetOrderList.IN_CANCEL
+        )
         .map(state =>
           ShopeeGetOrderListRecursive(s, state)
 

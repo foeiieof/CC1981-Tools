@@ -40,6 +40,10 @@ export class Order202309GetOrderListResponseDataOrdersLineItems {
     */
     'displayStatus'?: string;
     /**
+    * Retail price of the free item in orders Live giveaway, free sample and gift with purchase. For other orders, this field always returns 0.  This amount can be used for free samples and live giveaway order invoice in Brazil
+    */
+    'giftRetailPrice'?: string;
+    /**
     * [**Deprecated**: This field is deprecated and will be removed in a future API version. Use `handling_duration` instead.]  The number of business days required for the seller to process the order and hand it over to a shipping carrier after the order is placed.  Applicable only if the value for `sku_type` is `MADE_TO_ORDER`.
     */
     'handlingDurationDays'?: string;
@@ -175,6 +179,11 @@ export class Order202309GetOrderListResponseDataOrdersLineItems {
         {
             "name": "displayStatus",
             "baseName": "display_status",
+            "type": "string"
+        },
+        {
+            "name": "giftRetailPrice",
+            "baseName": "gift_retail_price",
             "type": "string"
         },
         {

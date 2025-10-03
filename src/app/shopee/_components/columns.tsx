@@ -1,5 +1,4 @@
 "use client"
-import Image from "next/image"
 import { ArrowUpDown } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
@@ -14,104 +13,187 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { IResShopee_GetOrderList_Struct } from "@/app/api/shopee/order/route"
-import { IResShopee_GetOrderWithDetailsList_Struct, IResShopee_GetOrderWithDetailsList_Struct_ItemList } from "@/app/api/shopee/order/details/route"
-
-export const ShopeeOrderDetailsColumn: ColumnDef<IResShopee_GetOrderWithDetailsList_Struct>[] = [
-  {
-    accessorKey: "shop_id",
-    header: "Shop ID",
-    cell: info => info.getValue() ?? "-",
-  },
-  {
-    accessorKey: "order_sn",
-    header: "Order SN",
-  },
-  {
-    accessorKey: "item_list",
-    header: "Item",
-    cell: info => {
-      const items = info.getValue() as IResShopee_GetOrderWithDetailsList_Struct_ItemList[];
-      // console.log(`item-list : url ${JSON.stringify(items)}`)
-      const item = items[0]
-      // return (
-      //   <div className="flex space-x-1">
-      //     {items?.map((i, idx) =>
-      //       i.image_info?.image_url ? (
-      //         <Image
-      //           key={`img-${i.item_id}-${idx}`}
-      //           src={i.image_info.image_url}
-      //           alt={i.item_name ?? "Item image"}
-      //           className="h-10 w-10 object-cover rounded"
-      //         />
-      //       ) : null
-      //     )}
-      //   </div>
-      // );
-      return (
-        <div className="flex space-x-1">
-          <Image
-            key={`img-${item.item_id}`}
-            src={item.image_info?.image_url ?? ""}
-            alt={item.item_name}
-
-            height={160}
-            width={120}
-            className="h-auto w-[120px] object-cover rounded border"
-          />
-          {/* {items.image_info?.image_url} */}
-        </div>
-      );
-    }
-  },
-  // {
-  //   accessorKey: "booking_sn",
-  //   header: "Booking SN",
-  // },
-  {
-    accessorKey: "order_status",
-    header: "Order Status",
-  },
-  {
-    accessorKey: "shipping_carrier",
-    header: "Shipping Carrier",
-  },
-  {
-    accessorKey: "cod",
-    header: "COD",
-    cell: info => (info.getValue() ? "Yes" : "No")
-  },
-  {
-    accessorKey: "total_amount",
-    header: "Total Amount",
-    cell: info => (info.getValue() as number).toLocaleString(),
-  },
-  {
-    accessorKey: "payment_method",
-    header: "Payment Method",
-  },
-  // {
-  //   accessorKey: "item_list",
-  //   header: "Item List",
-  //   cell: info => JSON.stringify(info.getValue()),
-  // },
-  {
-    accessorKey: "create_time",
-    header: "Create Time",
-    cell: info => new Date(info.getValue() as number * 1000).toLocaleString(),
-  },
-  {
-    accessorKey: "update_time",
-    header: "Update Time",
-    cell: info => new Date(info.getValue() as number * 1000).toLocaleString(),
-  },
-  {
-    accessorKey: "pickup_done_time",
-    header: "Pickup Done Time",
-    cell: info => info.getValue() ? new Date(info.getValue() as string | Date).toLocaleString() : "-",
-  },
 
 
-]
+// export const ShopeeOrderDetailsColumn: ColumnDef<IResShopee_GetOrderWithDetailsList_Struct>[] = [
+//   {
+//     accessorKey: "shop_id",
+//     header: "Shop ID",
+//     cell: info => info.getValue() ?? "-",
+//   },
+//   {
+//     accessorKey: "order_sn",
+//     header: "Order SN",
+//     cell: ({ row }) => {
+//       const order = row.original
+//       return (
+//         <button
+//           className="flex flex-row justify-center items-center gap-2 hover:bg-zinc-100  p-2 rounded-lg "
+//           type="button"
+//           onClick={() => {
+//             toast.success(`Copy OrderSN : ${order.order_sn}`)
+//             navigator.clipboard.writeText(order.order_sn)
+//           }}
+//         >
+//           {order.order_sn}
+//           <Copy size={12} />
+
+//         </button>
+//       )
+//     }
+//   },
+//   {
+//     accessorKey: "item_list",
+//     header: "Item",
+//     cell: info => {
+//       const items = info.getValue() as IResShopee_GetOrderWithDetailsList_Struct_ItemList[];
+//       // console.log(`item-list : url ${JSON.stringify(items)}`)
+//       const item = items[0]
+//       // return (
+//       //   <div className="flex space-x-1">
+//       //     {items?.map((i, idx) =>
+//       //       i.image_info?.image_url ? (
+//       //         <Image
+//       //           key={`img-${i.item_id}-${idx}`}
+//       //           src={i.image_info.image_url}
+//       //           alt={i.item_name ?? "Item image"}
+//       //           className="h-10 w-10 object-cover rounded"
+//       //         />
+//       //       ) : null
+//       //     )}
+//       //   </div>
+//       // );
+//       return (
+//         <div className="flex space-x-1">
+//           <Image
+//             key={`img-${item.item_id}`}
+//             src={item.image_info?.image_url ?? ""}
+//             alt={item.item_name}
+
+//             height={160}
+//             width={120}
+//             className="h-auto w-[120px] object-cover rounded border"
+//           />
+//           {/* {items.image_info?.image_url} */}
+//         </div>
+//       );
+//     }
+//   },
+//   // {
+//   //   accessorKey: "booking_sn",
+//   //   header: "Booking SN",
+//   // },
+//   {
+//     accessorKey: "order_status",
+//     header: "Order Status",
+//   },
+//   {
+//     accessorKey: "shipping_carrier",
+//     header: "Shipping Carrier",
+//   },
+//   {
+//     accessorKey: "cod",
+//     header: "COD",
+//     cell: info => {
+//       const data = info.getValue() ? "Yes" : "No"
+//       return (<span className={`font-bold ${data === "Yes" ? " text-green-600" : "text-red-600"}`}> {data}</span>)
+//     }
+//   },
+//   {
+//     accessorKey: "total_amount",
+//     header: "Total Amount",
+//     cell: info => (info.getValue() as number).toLocaleString() + " ฿",
+//   },
+//   {
+//     accessorKey: "payment_method",
+//     header: "Payment Method",
+//     cell: info => {
+//       const data = (info.getValue() as string)
+//       return (
+//         <span className="max-w-16 text-balance">
+//           {data}
+//         </span>
+//       )
+//     }
+//   },
+//   // {
+//   //   accessorKey: "item_list",
+//   //   header: "Item List",
+//   //   cell: info => JSON.stringify(info.getValue()),
+//   // },
+//   {
+//     accessorKey: "create_time",
+//     header: "Create Time",
+//     cell: info => {
+//       // const opts: Intl.DateTimeFormatOptions = 
+//       const time = new Date(info.getValue() as number * 1000).toLocaleString("th-TH", {
+//         year: "numeric",
+//         month: "2-digit",
+//         day: "2-digit",
+//         hour: "2-digit",
+//         minute: "2-digit"
+//       })
+//       return (
+//         <span>
+//           {time}
+//         </span>
+//       )
+//     },
+//   },
+//   {
+//     accessorKey: "update_time",
+//     header: "Update Time",
+//     cell: info => {
+//       const time = new Date(info.getValue() as number * 1000).toLocaleString("th-TH", {
+//         year: "numeric",
+//         month: "2-digit",
+//         day: "2-digit",
+//         hour: "2-digit",
+//         minute: "2-digit"
+//       })
+//       return (
+//         <span>
+//           {time}
+//         </span>
+//       )
+//     },
+//   },
+
+
+//   // {
+//   //   accessorKey: "pickup_done_time",
+//   //   header: "Pickup Done ",
+//   //   cell: info => info.getValue() ? new Date(info.getValue() as string | Date).toLocaleString() : "-",
+//   // },
+//   {
+//     id: "actions",
+//     enableHiding: false,
+//     cell: ({ row }) => {
+//       const order = row.original
+//       return (
+//         <DropdownMenu>
+//           <DropdownMenuTrigger asChild>
+//             <Button variant="ghost" className="h-8 w-8 p-0">
+//               <span className="sr-only">Open menu</span>
+//               <MoreHorizontal />
+//             </Button>
+//           </DropdownMenuTrigger>
+//           <DropdownMenuContent align="end">
+//             <DropdownMenuItem
+//               onClick={() => {
+//                 // setSelectOrder(order)
+//                 // isModalOrderDetails(true)
+//               }}
+//             >View order details</DropdownMenuItem>
+//             <DropdownMenuSeparator />
+//             <DropdownMenuItem>Generate AWB</DropdownMenuItem>
+//             <DropdownMenuItem>Dowload AWB</DropdownMenuItem>
+//           </DropdownMenuContent>
+//         </DropdownMenu>
+//       )
+//     },
+//   },
+// ]
 
 export const ShopeeOrderColumn: ColumnDef<IResShopee_GetOrderList_Struct>[] = [
   {

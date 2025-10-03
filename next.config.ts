@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // reactStrictMode: false,
   // appDir: true,
   images: {
     remotePatterns: [
@@ -8,10 +9,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cf.shopee.co.th",
         pathname: "/**"
+      },
+      {
+        protocol: "https",
+        hostname: "*.ibyteimg.com",
+        pathname: "/**"
       }
+
     ]
   },
-  allowedDevOrigins: ['http://localhost:3000', '10.128.111.53'],
+  allowedDevOrigins: ['10.128.111.156'],
 };
-
+// p19-oec-sg.ibyteimg.com
 export default nextConfig;

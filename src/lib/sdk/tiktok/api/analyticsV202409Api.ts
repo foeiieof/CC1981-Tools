@@ -92,19 +92,19 @@ export class AnalyticsV202409Api {
     }
 
     /**
-     * Returns overall performance metrics for all videos under a shop. This API currently provides data only for shops registered in the United States, United Kingdom, Singapore, Vietnam, and Thailand.
+     * Returns overall performance metrics for all videos under a shop.
      * @summary GetShopVideoPerformanceOverview
      * @param startDateGe Start date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;ge\&quot; refers to \&quot;greater than or equal to\&quot; (inclusive)
      * @param endDateLt End date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;lt\&quot; refers to \&quot;less than\&quot; (exclusive)
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param withComparison Whether previous period data is returned for comparison. Available values: true, false Default value: false The previous period has the same length and granularity as the current period with end time being the same as the start time of the current period. Example: If start_time_ge &#x3D; 2024-04-01 and end_time_lt &#x3D; 2024-04-08, the previous period data will be from 2024-03-25 to 2024-04-01.
      * @param granularity Granularity of the data. Available values: ALL, 1D Default value: ALL * ALL: aggregate * 1D: daily
      * @param currency Currency. Available values: USD, LOCAL Default value: LOCAL * USD: US dollars * LOCAL: local currency where the shop is located
      * @param accountType Types of the accounts under which videos were created. Available values: ALL, LINKED_ACCOUNTS, AFFILIATES Default value: ALL * ALL: all account types * LINKED_ACCOUNTS: linked account types, includes official and marketing account types * AFFILIATES: affiliate account type
-     * @param shopCipher 
      */
-    public async ShopVideosOverviewPerformanceGet (startDateGe: string, endDateLt: string, xTtsAccessToken: string, contentType: string, withComparison?: boolean, granularity?: string, currency?: string, accountType?: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202409GetShopVideoPerformanceOverviewResponse;  }> {
+    public async ShopVideosOverviewPerformanceGet (startDateGe: string, endDateLt: string, shopCipher: string, xTtsAccessToken: string, contentType: string, withComparison?: boolean, granularity?: string, currency?: string, accountType?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202409GetShopVideoPerformanceOverviewResponse;  }> {
         const localVarPath = this.basePath + '/analytics/202409/shop_videos/overview_performance';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -125,6 +125,11 @@ export class AnalyticsV202409Api {
         // verify required parameter 'endDateLt' is not null or undefined
         if (endDateLt === null || endDateLt === undefined) {
             throw new Error('Required parameter endDateLt was null or undefined when calling ShopVideosOverviewPerformanceGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ShopVideosOverviewPerformanceGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined
@@ -213,10 +218,11 @@ export class AnalyticsV202409Api {
         });
     }
     /**
-     * Returns a list of videos and associated metrics for a shop. This API currently provides data only for shops registered in the United States, United Kingdom, Singapore, Vietnam, and Thailand.
+     * Returns a list of videos and associated metrics for a shop.
      * @summary GetShopVideoPerformanceList
      * @param startDateGe Start date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;ge\&quot; refers to \&quot;greater than or equal to\&quot; (inclusive)
      * @param endDateLt End date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;lt\&quot; refers to \&quot;less than\&quot; (exclusive)
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param pageSize Number of products per page. Max value: 100 Default value: 10
@@ -225,9 +231,8 @@ export class AnalyticsV202409Api {
      * @param currency Currency. Available values: USD, LOCAL Default value: LOCAL * USD: US dollars * LOCAL: local currency where the shop is located
      * @param pageToken Page token, indicating the current position. Used for requesting next page data. Leave this field empty for first time queries.
      * @param accountType Types of the accounts under which videos were created. Available values: ALL, LINKED_ACCOUNTS, AFFILIATES Default value: ALL * ALL: all account types * LINKED_ACCOUNTS: linked account types, includes official and marketing account types * AFFILIATES: affiliate account type
-     * @param shopCipher 
      */
-    public async ShopVideosPerformanceGet (startDateGe: string, endDateLt: string, xTtsAccessToken: string, contentType: string, pageSize?: number, sortField?: string, sortOrder?: string, currency?: string, pageToken?: string, accountType?: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202409GetShopVideoPerformanceListResponse;  }> {
+    public async ShopVideosPerformanceGet (startDateGe: string, endDateLt: string, shopCipher: string, xTtsAccessToken: string, contentType: string, pageSize?: number, sortField?: string, sortOrder?: string, currency?: string, pageToken?: string, accountType?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202409GetShopVideoPerformanceListResponse;  }> {
         const localVarPath = this.basePath + '/analytics/202409/shop_videos/performance';
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
@@ -248,6 +253,11 @@ export class AnalyticsV202409Api {
         // verify required parameter 'endDateLt' is not null or undefined
         if (endDateLt === null || endDateLt === undefined) {
             throw new Error('Required parameter endDateLt was null or undefined when calling ShopVideosPerformanceGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ShopVideosPerformanceGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined
@@ -344,19 +354,19 @@ export class AnalyticsV202409Api {
         });
     }
     /**
-     * Returns detailed performance metrics for a (requested) video. This API currently provides data only for shops registered in the United States, United Kingdom, Singapore, Vietnam, and Thailand.
+     * Returns detailed performance metrics for a (requested) video. 
      * @summary GetShopVideoPerformanceDetails
      * @param videoId Video ID
      * @param startDateGe Start date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;ge\&quot; refers to \&quot;greater than or equal to\&quot; (inclusive)
      * @param endDateLt End date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;lt\&quot; refers to \&quot;less than\&quot; (exclusive)
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param withComparison Whether previous period data is returned for comparison. Available values: true, false Default value: false The previous period has the same length and granularity as the current period with end time being the same as the start time of the current period. Example: If start_time_ge &#x3D; 2024-04-01 and end_time_lt &#x3D; 2024-04-08, the previous period data will be from 2024-03-25 to 2024-04-01.
      * @param granularity Granularity of the data. Available values: ALL, 1D Default value: ALL * ALL: aggregate * 1D: daily
      * @param currency Currency. Available values: USD, LOCAL Default value: LOCAL * USD: US dollars * LOCAL: local currency where the shop is located
-     * @param shopCipher 
      */
-    public async ShopVideosVideoIdPerformanceGet (videoId: string, startDateGe: string, endDateLt: string, xTtsAccessToken: string, contentType: string, withComparison?: boolean, granularity?: string, currency?: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202409GetShopVideoPerformanceDetailsResponse;  }> {
+    public async ShopVideosVideoIdPerformanceGet (videoId: string, startDateGe: string, endDateLt: string, shopCipher: string, xTtsAccessToken: string, contentType: string, withComparison?: boolean, granularity?: string, currency?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202409GetShopVideoPerformanceDetailsResponse;  }> {
         const localVarPath = this.basePath + '/analytics/202409/shop_videos/{video_id}/performance'
             .replace('{' + 'video_id' + '}', encodeURIComponent(String(videoId)));
         let localVarQueryParameters: any = {};
@@ -383,6 +393,11 @@ export class AnalyticsV202409Api {
         // verify required parameter 'endDateLt' is not null or undefined
         if (endDateLt === null || endDateLt === undefined) {
             throw new Error('Required parameter endDateLt was null or undefined when calling ShopVideosVideoIdPerformanceGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ShopVideosVideoIdPerformanceGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined
@@ -467,11 +482,12 @@ export class AnalyticsV202409Api {
         });
     }
     /**
-     * Returns performance metrics for a list of products promoted in a given video. This API currently provides data only for shops registered in the United States, United Kingdom, Singapore, Vietnam, and Thailand.
+     * Returns performance metrics for a list of products promoted in a given video.
      * @summary GetShopVideoProductPerformanceList
-     * @param videoId 
+     * @param videoId Video ID
      * @param endDateLt End date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;lt\&quot; refers to \&quot;less than\&quot; (exclusive)
      * @param startDateGe Start date (ISO 8601 YYYY-MM-DD format) in shop registered timezone. In the parameter name, \&quot;ge\&quot; refers to \&quot;greater than or equal to\&quot; (inclusive)
+     * @param shopCipher Use this property to pass shop information in requesting the API. Failure in passing the correct value when requesting the API for cross-border shops will return incorrect response. Get by API [Get Authorization Shop](https://partner.tiktokshop.com/docv2/page/6507ead7b99d5302be949ba9?external_id&#x3D;6507ead7b99d5302be949ba9)
      * @param xTtsAccessToken 
      * @param contentType Allowed type: application/json
      * @param pageSize Number of products per page. Max value: 100 Default value: 10
@@ -479,9 +495,8 @@ export class AnalyticsV202409Api {
      * @param sortOrder Sort direction. Available values: ASC, DESC Default value: DESC * ASC: ascending * DESC: descending
      * @param currency Currency. Available values: USD, LOCAL Default value: LOCAL * USD: US dollars * LOCAL: local currency where the shop is located
      * @param pageToken Page token, indicating the current position. Used for requesting next page data. Leave this field empty for first time queries.
-     * @param shopCipher 
      */
-    public async ShopVideosVideoIdProductsPerformanceGet (videoId: string, endDateLt: string, startDateGe: string, xTtsAccessToken: string, contentType: string, pageSize?: number, sortField?: string, sortOrder?: string, currency?: string, pageToken?: string, shopCipher?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202409GetShopVideoProductPerformanceListResponse;  }> {
+    public async ShopVideosVideoIdProductsPerformanceGet (videoId: string, endDateLt: string, startDateGe: string, shopCipher: string, xTtsAccessToken: string, contentType: string, pageSize?: number, sortField?: string, sortOrder?: string, currency?: string, pageToken?: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: Analytics202409GetShopVideoProductPerformanceListResponse;  }> {
         const localVarPath = this.basePath + '/analytics/202409/shop_videos/{video_id}/products/performance'
             .replace('{' + 'video_id' + '}', encodeURIComponent(String(videoId)));
         let localVarQueryParameters: any = {};
@@ -508,6 +523,11 @@ export class AnalyticsV202409Api {
         // verify required parameter 'startDateGe' is not null or undefined
         if (startDateGe === null || startDateGe === undefined) {
             throw new Error('Required parameter startDateGe was null or undefined when calling ShopVideosVideoIdProductsPerformanceGet.');
+        }
+
+        // verify required parameter 'shopCipher' is not null or undefined
+        if (shopCipher === null || shopCipher === undefined) {
+            throw new Error('Required parameter shopCipher was null or undefined when calling ShopVideosVideoIdProductsPerformanceGet.');
         }
 
         // verify required parameter 'xTtsAccessToken' is not null or undefined

@@ -34,6 +34,8 @@ export * from './fulfillmentV202407Api';
 import { FulfillmentV202407Api, FulfillmentV202407ApiOperationNames, FulfillmentV202407ApiOperationTypes } from './fulfillmentV202407Api';
 export * from './fulfillmentV202502Api';
 import { FulfillmentV202502Api, FulfillmentV202502ApiOperationNames, FulfillmentV202502ApiOperationTypes } from './fulfillmentV202502Api';
+export * from './fulfillmentV202508Api';
+import { FulfillmentV202508Api, FulfillmentV202508ApiOperationNames, FulfillmentV202508ApiOperationTypes } from './fulfillmentV202508Api';
 export * from './logisticsV202309Api';
 import { LogisticsV202309Api, LogisticsV202309ApiOperationNames, LogisticsV202309ApiOperationTypes } from './logisticsV202309Api';
 export * from './orderV202309Api';
@@ -80,16 +82,16 @@ export * from './supplyChainV202309Api';
 import { SupplyChainV202309Api, SupplyChainV202309ApiOperationNames, SupplyChainV202309ApiOperationTypes } from './supplyChainV202309Api';
 import * as http from 'http';
 
+// export { RequestFile } from '.../model/models.ts';
+
 export class HttpError extends Error {
-  constructor(public response: http.IncomingMessage, public body: unknown, public statusCode?: number) {
+  constructor(public response: http.IncomingMessage, public body: any, public statusCode?: number) {
     super('HTTP request failed');
     this.name = 'HttpError';
   }
 }
 
-export type { RequestFile } from '../model/models';
-
-export const APIS = [AnalyticsV202405Api, AnalyticsV202406Api, AnalyticsV202409Api, AnalyticsV202508Api, AuthorizationV202309Api, AuthorizationV202312Api, AuthorizationV202401Api, AuthorizationV202403Api, DataReconciliationV202309Api, DataReconciliationV202310Api, DataReconciliationV202401Api, EventV202309Api, FinanceV202309Api, FinanceV202501Api, FinanceV202507Api, FulfillmentV202309Api, FulfillmentV202407Api, FulfillmentV202502Api, LogisticsV202309Api, OrderV202309Api, OrderV202407Api, OrderV202507Api, ProductV202309Api, ProductV202312Api, ProductV202401Api, ProductV202404Api, ProductV202405Api, ProductV202407Api, ProductV202409Api, ProductV202411Api, ProductV202501Api, ProductV202502Api, ProductV202505Api, ProductV202506Api, ProductV202507Api, PromotionV202309Api, PromotionV202406Api, ReturnRefundV202309Api, SellerV202309Api, SupplyChainV202309Api];
+export const APIS = [AnalyticsV202405Api, AnalyticsV202406Api, AnalyticsV202409Api, AnalyticsV202508Api, AuthorizationV202309Api, AuthorizationV202312Api, AuthorizationV202401Api, AuthorizationV202403Api, DataReconciliationV202309Api, DataReconciliationV202310Api, DataReconciliationV202401Api, EventV202309Api, FinanceV202309Api, FinanceV202501Api, FinanceV202507Api, FulfillmentV202309Api, FulfillmentV202407Api, FulfillmentV202502Api, FulfillmentV202508Api, LogisticsV202309Api, OrderV202309Api, OrderV202407Api, OrderV202507Api, ProductV202309Api, ProductV202312Api, ProductV202401Api, ProductV202404Api, ProductV202405Api, ProductV202407Api, ProductV202409Api, ProductV202411Api, ProductV202501Api, ProductV202502Api, ProductV202505Api, ProductV202506Api, ProductV202507Api, PromotionV202309Api, PromotionV202406Api, ReturnRefundV202309Api, SellerV202309Api, SupplyChainV202309Api];
 
 export enum API_ENUM {
   AnalyticsV202405Api = 'AnalyticsV202405Api',
@@ -110,6 +112,7 @@ export enum API_ENUM {
   FulfillmentV202309Api = 'FulfillmentV202309Api',
   FulfillmentV202407Api = 'FulfillmentV202407Api',
   FulfillmentV202502Api = 'FulfillmentV202502Api',
+  FulfillmentV202508Api = 'FulfillmentV202508Api',
   LogisticsV202309Api = 'LogisticsV202309Api',
   OrderV202309Api = 'OrderV202309Api',
   OrderV202407Api = 'OrderV202407Api',
@@ -153,6 +156,7 @@ export const API_OBJECT = {
   FulfillmentV202309Api: FulfillmentV202309Api,
   FulfillmentV202407Api: FulfillmentV202407Api,
   FulfillmentV202502Api: FulfillmentV202502Api,
+  FulfillmentV202508Api: FulfillmentV202508Api,
   LogisticsV202309Api: LogisticsV202309Api,
   OrderV202309Api: OrderV202309Api,
   OrderV202407Api: OrderV202407Api,
@@ -196,6 +200,7 @@ export const API_OPERATION_NAME_MAP = {
   FulfillmentV202309Api: FulfillmentV202309ApiOperationNames,
   FulfillmentV202407Api: FulfillmentV202407ApiOperationNames,
   FulfillmentV202502Api: FulfillmentV202502ApiOperationNames,
+  FulfillmentV202508Api: FulfillmentV202508ApiOperationNames,
   LogisticsV202309Api: LogisticsV202309ApiOperationNames,
   OrderV202309Api: OrderV202309ApiOperationNames,
   OrderV202407Api: OrderV202407ApiOperationNames,
@@ -239,6 +244,7 @@ export type API_OPERATION_TYPE_MAP = {
   FulfillmentV202309Api: FulfillmentV202309ApiOperationTypes;
   FulfillmentV202407Api: FulfillmentV202407ApiOperationTypes;
   FulfillmentV202502Api: FulfillmentV202502ApiOperationTypes;
+  FulfillmentV202508Api: FulfillmentV202508ApiOperationTypes;
   LogisticsV202309Api: LogisticsV202309ApiOperationTypes;
   OrderV202309Api: OrderV202309ApiOperationTypes;
   OrderV202407Api: OrderV202407ApiOperationTypes;
