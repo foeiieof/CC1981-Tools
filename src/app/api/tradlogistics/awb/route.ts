@@ -1,4 +1,4 @@
-import { ResponseHandle } from "@/app/api/utility"
+import { IResponse, ResponseHandle } from "@/app/api/utility"
 import { TikTokShopNodeApiClient } from "@/lib/sdk/tiktok"
 import { PrismaClient } from "@prisma/client"
 import { NextRequest, NextResponse } from "next/server"
@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     // const awb = await prisma 
 
   } catch (error) {
-    return ResponseHandle.error("[Tiktok] GetOrderAWB", "", 400)
+    const err = error as IResponse<unknown>
+    return ResponseHandle.error("[Tiktok] GetOrderAWB", err.message, 400)
   }
 }

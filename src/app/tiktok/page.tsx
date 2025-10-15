@@ -2,11 +2,11 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue, } from "@/components/ui/select"
-import { IResponse } from '../api/utility'
+import { IResponse, Lgr } from '../api/utility'
 import { IResTiktokShopList } from '../api/tiktok/shop/route'
 import { useEffect, useMemo, useState } from "react"
-import { BookOpenText, Check, Copy, FileCheck2, HardDriveUpload, MoreHorizontal, PackagePlus, ReceiptText, Search } from "lucide-react"
-import axios, { AxiosError } from "axios"
+import { Archive, ArrowUpDown, BanknoteX, BookOpenText, Check, ClipboardCheck, ClipboardX, ClockArrowDown, Copy, FileCheck2, HandHelping, HardDriveUpload, MoreHorizontal, PackagePlus, ReceiptText, Search, Truck } from "lucide-react"
+// import axios, { AxiosError } from "axios"
 import { toast } from "sonner"
 import { IResTiktokOrderInformationAWB } from "../api/tiktok/order-awb/route"
 import { Tabs, TabsContent, TabsList, TabsTrigger, } from "@/components/ui/tabs"
@@ -25,6 +25,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import useSWR from "swr"
 import { DataTableForTiktok } from "./_components/DataTableForTiktok"
+import { AxiosError } from "axios"
+import { LogoImage } from "./_components/LogoImage"
+// import { Checkbox } from "@/components/ui/checkbox"
 
 
 // export enum EnumTiktokOrderStatusOnTab { UNPAID = "UNPAID" }
@@ -36,12 +39,10 @@ export enum EnumTiktokOrderStatus {
   PRE_ORDER = "PRE_ORDER",
 
   PARTIALLY_SHIPPING = "PARTIALLY_SHIPPING",
-
   AWAITING_SHIPMENT = "AWAITING_SHIPMENT",
   AWAITING_COLLECTION = "AWAITING_COLLECTION",
-
   IN_TRANSIT = "IN_TRANSIT",
-  DELIVERED = "DELIVERED",
+  ON_DELIVERED = "DELIVERED",
 
   COMPLETED = "COMPLETED",
 
@@ -56,7 +57,7 @@ async function FetchTikTokShopInformation() {
     const data: IResponse<IResTiktokShopList[]> = await res.json()
     return data.data ?? null
   } catch (err) {
-    console.log(`fetch [TikTok_ShopInfo] : ${err}`)
+    // console.log(`fetch [TikTok_ShopInfo] : ${err}`)
     return null
   }
 }
@@ -68,7 +69,7 @@ async function FetchTiktokOrderInformation(shop: string, accesstkn: string, orde
     return data.data
   } catch (error) {
     const err = error as AxiosError
-    toast.error(err.message)
+    toast.error(JSON.stringify(err))
     return null
   }
 }
@@ -97,17 +98,22 @@ async function FetchTiktokOrderAWB(shop: string, accesstkn: string, order: strin
 
 async function FetchTiktokOrderAWBToB2C(shop: string, accesstkn: string, order: string, pck: string) {
   try {
-    const url = new URL(`${process.env.NEXT_PUBLIC_BASE_API_URL}/api/tiktok/order-awb/${pck}`)
-    url.searchParams.append("shop_cipher", shop)
-    url.searchParams.append("access_token", accesstkn)
-    url.searchParams.append("order_id", order)
-    const res = await axios.post<IResponse<string>>(url.toString())
-    if (res) return res.data
-    return null
+    const url = await fetch(`/api/tiktok/order-awb/${pck}?shop_cipher=${shop}&access_token=${accesstkn}&order_id=${order}`, { method: "POST" })
+    // url.searchParams.append("shop_cipher", shop)
+    // url.searchParams.append("access_token", accesstkn)
+    // url.searchParams.append("order_id", order)
+    // const res = await axios.post<IResponse<string>>(url.toString())
+    const data: IResponse<string> = await url.json()
+    Lgr.info(data)
+    // console.log(`[API-FETCH] - ${JSON.stringify(data)}`)
+    if (data && data.status != 200) return data
+    Lgr.debug(data)
+    return data
   } catch (err) {
-    console.log(err)
-    const er = err as AxiosError<{ error: string }>
-    toast.error(`Order: ${order}\n` + er.response?.data.error)
+    Lgr.debug(err)
+
+    const er = err as Response
+    // toast.error(`Order: ${order}\n` + er.response?.data.error)
     return null
   }
 }
@@ -129,6 +135,9 @@ async function FetchTiktokOrderAWBToB2C(shop: string, accesstkn: string, order: 
 
 export default function TiktokPage() {
 
+
+  const [activeTab, setActiveTab] = useState<string>("UNPAID")
+
   const [tiktokShop, setTiktokShop] = useState<IResTiktokShopList[]>([])
   const [shopSelect, setShopSelect] = useState<IResTiktokShopList | null>(null)
   const [orderID, setOrderID] = useState<string>("")
@@ -142,6 +151,7 @@ export default function TiktokPage() {
   const { data: ordersAllShop } = useSWR<Record<string, IResTiktokOrderSDK[]>>(
     `/api/tiktok/order`, FetcherOrder,
     {
+      revalidateOnFocus: false,
       revalidateOnReconnect: false,
       refreshInterval: 0
     })
@@ -151,6 +161,7 @@ export default function TiktokPage() {
       const FetchTT = async () => {
         const res = await FetchTikTokShopInformation()
         if (res != null) setTiktokShop(res)
+        // console.log(JSON.stringify(res))
       }
       FetchTT()
     }
@@ -159,15 +170,20 @@ export default function TiktokPage() {
 
 
   async function SubmitSearch() {
-    console.log(orderID.trim().split(','))
+    // console.log(orderID.trim().split(','))
     if (!tiktokShop || orderID === "")
       toast.error('data is required')
+
+    // console.log(JSON.stringify(shopSelect))
+    // console.log(`Submit = ${JSON.stringify(tiktokShop.find(i => i.ShopID = ""))}`)
+
     const orderDe = await FetchTiktokOrderInformation(shopSelect?.CipherID ?? "", shopSelect?.AccessToken ?? "", orderID.trim().split(','))
     if (orderDe != null)
       setOrderList(orderDe)
   }
 
   async function DowloadAWBDoc(order: string, pkg: string, cipher?: string) {
+    // toast.success("asdasd")
     let cipherID: string
     let accessToken: string
     if (cipher) {
@@ -195,11 +211,35 @@ export default function TiktokPage() {
     }
   }
 
-  async function UploadAWBDocToB2C(order: string, pkg: string) {
-    const uploaded = await FetchTiktokOrderAWBToB2C(shopSelect?.CipherID ?? "", shopSelect?.AccessToken ?? "", order, pkg)
-    if (uploaded != null) {
-      toast.success(uploaded.data?.toString())
+  async function UploadAWBDocToB2C(order: string, pkg: string, shopName?: string) {
+    // toast.success(shopName)
+    try {
+
+      let shop: IResTiktokShopList | undefined
+      if (shopName != "") {
+        const sh = tiktokShop.find(i => i.ShopName === shopName)
+        // console.log(`[API] - shopSelect : ${JSON.stringify(sh)}`)
+        shop = sh
+      } else {
+        // console.log(`[API] - shopS : ${JSON.stringify(shopSelect)}`)
+        shop = shopSelect ?? undefined
+      }
+
+      const uploaded: IResponse<string> | null = await FetchTiktokOrderAWBToB2C(shop?.CipherID ?? "", shop?.AccessToken ?? "", order, pkg)
+      if (uploaded != null && uploaded.status === 200) {
+        // [Test-Queue]
+        // orderList?.find( i => i.order_id === order )?.on_server = true
+        setOrderList(prev => prev?.map(i => i.order_id === order ? { ...i, on_server: true } : i))
+        toast.success(`Uploaded : ${uploaded.data?.toString()}`)
+      } else {
+        toast.error(`Uploaded : ${uploaded?.message}`)
+      }
+
+    } catch (error) {
+      const err = error as IResponse<unknown>
+      toast.error(`Uploaded : ${err.message}`)
     }
+
   }
 
   const DialogTiktokOrder = useMemo(() => {
@@ -209,19 +249,46 @@ export default function TiktokPage() {
 
 
   const TiktokOrderDetailsColumn: ColumnDef<IResTiktokOrderSDK>[] = [
+    // {
+    //   id: "select",
+    //   header: ({ table }) => (
+    //     <Checkbox
+    //       checked={
+    //         table.getIsAllPageRowsSelected() ||
+    //         (table.getIsSomePageRowsSelected() && "indeterminate")
+    //       }
+    //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //       aria-label="Select all"
+    //     />
+    //   ),
+    //   cell: ({ row }) => (
+    //     <Checkbox
+    //       checked={row.getIsSelected()}
+    //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+    //       aria-label="Select row"
+    //     />
+    //   ),
+    //   enableSorting: false,
+    //   enableHiding: false,
+    // },
     {
       accessorKey: "shop_name",
       header: "Shop Name",
-      cell: info => info.getValue() ?? "-",
+      cell: ({ row }) => {
+        const data = row.original
+        return (
+          <LogoImage brand={(data && data.shop_name) ?? ""} />
+        )
+      },
     },
     {
       accessorKey: "id",
-      header: "Order SN",
+      header: "Order",
       cell: ({ row }) => {
         const order = row.original
         return (
           <button
-            className="flex flex-row justify-center items-center gap-2 hover:bg-zinc-100  p-2 rounded-lg "
+            className="flex flex-row justify-center items-center gap-2 hover:bg-zinc-100  p-2 rounded-lg text-[10px] "
             type="button"
             onClick={() => {
               toast.success(`Copy OrderSN : ${order.id}`)
@@ -244,12 +311,12 @@ export default function TiktokPage() {
           return (
             <div className="flex space-x-1">
               <Image
-                key={`img-${item}`}
+                key={`img - ${item}`}
                 src={item.skuImage ?? ""}
                 alt={item.skuName ?? ""}
                 height={160}
                 width={120}
-                className="h-auto w-[120px] object-cover rounded border"
+                className="h-auto w-full object-cover rounded border max-w-[64px]"
                 loading="lazy"
               />
             </div>
@@ -264,17 +331,26 @@ export default function TiktokPage() {
     {
       accessorKey: "status",
       header: "Order Status",
+      cell: info => {
+        const data = info.getValue() as string
+        return (<span className="text-[10px]">{data}</span>)
+      }
     },
     {
       accessorKey: "shippingProvider",
-      header: "Shipping Carrier",
+      header: "Shipping",
+      cell: info => {
+        const data = info.getValue() as string ?? ""
+        return (<span className="text-[10px]">{data.slice(0, 13)}</span>)
+      }
+
     },
     {
       accessorKey: "isCod",
       header: "COD",
       cell: info => {
         const data = info.getValue() ? "Yes" : "No"
-        return (<span className={`font-bold ${data === "Yes" ? " text-green-600" : "text-red-600"}`}> {data}</span>)
+        return (<span className={`font - bold ${data === "Yes" ? " text-green-600" : "text-red-600"} `}> {data}</span>)
       }
     },
     {
@@ -282,8 +358,13 @@ export default function TiktokPage() {
       header: "Total Amount",
       cell: info => {
         const payment: Order202309GetOrderListResponseDataOrdersPayment | undefined = info.getValue() as Order202309GetOrderListResponseDataOrdersPayment
+        const fmt = new Intl.NumberFormat("en-US", {
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 0
+
+        })
         return (
-          <span>{payment.totalAmount + "฿"}</span>
+          <span className="text-[10px]">{fmt.format(Number(payment.totalAmount) ?? 0) + "฿"}</span>
         )
       }
     },
@@ -293,8 +374,8 @@ export default function TiktokPage() {
       cell: info => {
         const data = (info.getValue() as string)
         return (
-          <span className="max-w-16 text-balance">
-            {data}
+          <span className="max-w-16 text-wrap text-[10px]">
+            {data.slice(0, 13)}
           </span>
         )
       }
@@ -302,7 +383,18 @@ export default function TiktokPage() {
 
     {
       accessorKey: "createTime",
-      header: "Create Time",
+      header: ({ column }) => {
+        return (
+          <Button
+            className="text-[10px]"
+            variant={"ghost"}
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            CreateTime
+            <ArrowUpDown strokeWidth={2} size={8} />
+          </Button>
+        )
+      },
       cell: info => {
         const time = new Date(info.getValue() as number * 1000).toLocaleString("th-TH", {
           year: "numeric",
@@ -312,7 +404,7 @@ export default function TiktokPage() {
           minute: "2-digit"
         })
         return (
-          <span>
+          <span className="text-[12px]">
             {time}
           </span>
         )
@@ -321,8 +413,9 @@ export default function TiktokPage() {
     {
       accessorKey: "updateTime",
       header: "Update Time",
-      cell: info => {
-        const time = new Date(info.getValue() as number * 1000).toLocaleString("th-TH", {
+      cell: ({ row }) => {
+        const data = row.original
+        const time = new Date((data.createTime ?? 0 as number) * 1000).toLocaleString("th-TH", {
           year: "numeric",
           month: "2-digit",
           day: "2-digit",
@@ -330,7 +423,7 @@ export default function TiktokPage() {
           minute: "2-digit"
         })
         return (
-          <span>
+          <span className="text-[12px]">
             {time}
           </span>
         )
@@ -338,29 +431,29 @@ export default function TiktokPage() {
     },
     {
       accessorKey: "on_server",
-      header: "B2CServer",
-      cell: i => {
-
-        if (i.row.original.status === "UNPAID" || i.row.original.status === "ON_HOLD") return null
-
-        const check = i.getValue() as boolean
+      header: "B2C",
+      cell: ({ row }) => {
+        const data = row.original
+        if (data.status === "UNPAID" || data.status === "ON_HOLD") return null
+        const order = data.id ?? ""
+        const pkg = data.packages?.map(i => i.id).join("") ?? ""
+        const check = data.on_server
         if (check) {
           return (
-            <Check className="bg-green-400 rounded-full text-white p-[2px] mx-auto" />
+            <Check size={16} className="bg-green-400 rounded-full text-white p-[2px] mx-auto" />
           )
         } else {
           return (
-            <div className="flex justify-center items-center">
-              <Button className="">
-                <HardDriveUpload />
-              </Button>
-            </div>
+            <Button className="w-8 h-8 px-[2px]" onClick={() => { UploadAWBDocToB2C(order, pkg, data.shop_name) }}>
+              <HardDriveUpload size={10} />
+            </Button>
           )
         }
       }
     },
     {
       id: "actions",
+      header: "Action",
       enableHiding: false,
       cell: ({ row }) => {
         const order = row.original
@@ -435,175 +528,251 @@ export default function TiktokPage() {
     },
   ]
 
+  const iconMap: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
+    UNPAID: BanknoteX,
+    ON_HOLD: HandHelping,
+    PRE_ORDER: ClockArrowDown,
+    DELIVERED: Truck,
+    COMPLETED: ClipboardCheck,
+    CANCELLED: ClipboardX
+  }
+
+  function TabIcon({ tab, active = false }: { tab: string, active?: boolean }) {
+    const Icon = iconMap[tab] || BanknoteX
+    return (
+      <Icon
+        className={`w-5 h-5 transition-colors duration-200 ${active ? "text-zinc-600 stroke-[2.3]" : "text-zinc-400 stroke-[1.5]"
+          }`}
+      />
+
+    )
+  }
+
+  // const iconMap: Record<string, IconNode> = {
+  //   UNPAID: BanknoteX,
+  //   // HOME: Home,
+  //   // SETTINGS: Settings,
+  // }
+
+  // function TabIcon({ tab }: { tab: string }) {
+  //   const Icon = iconMap[tab] || BanknoteX
+  //   return <Icon className="w-5 h-5" />
+  // }
+
   return (
-    <div className="font-sans grid items-start justify-items-center p-8 pb-20 sm:p-20">
-      <main className="w-full  flex flex-col gap-[32px] h-[80vh] row-start-2 justify-start items-center">
+    <div className="font-sans grid items-start justify-items-center p-4 pb-20 sm:p-20">
+      <main className="w-full  flex flex-row gap-6 h-[80vh] row-start-2 justify-center items-start">
+        <div>
+          <Tabs
+            value={activeTab}
+            onValueChange={(v) => setActiveTab(v)}
+            className="w-full">
+            <TabsList className="grid w-full grid-cols-6">
+              {
+                Object.values(EnumTiktokOrderStatus).filter(i => i != "UNKNOWN").filter(s => s != EnumTiktokOrderStatus.PARTIALLY_SHIPPING && s != EnumTiktokOrderStatus.IN_TRANSIT && s != EnumTiktokOrderStatus.AWAITING_COLLECTION && s != EnumTiktokOrderStatus.AWAITING_SHIPMENT).map(e => {
+                  const dataCount = ordersAllShop && ordersAllShop[e] ? ordersAllShop[e].length : null
+                  return (
+                    <TabsTrigger key={e} value={e.toString()} className="group">
+                      <TabIcon tab={e} active={activeTab === e} />
+                      <span className="text-[10px]  text-zinc-400 group-data-[state=active]:text-black ">{e.toString()}</span>
+                      <div className={`w-fit h-fit px-[6px] text-center font-bold text-[10px] bg-zinc-200 rounded-full text-white group-data-[state=active]:text-black`}>
+                        {dataCount}
+                      </div>
+                    </TabsTrigger>
+                  )
+                })}
+            </TabsList>
+
+            {ordersAllShop ?
+              Object.values(EnumTiktokOrderStatus).filter(i => i != "UNKNOWN").map(e => {
+                const data = ordersAllShop && ordersAllShop[e] ? ordersAllShop[e] : []
+
+                if (e === EnumTiktokOrderStatus.ON_DELIVERED) {
+                  // console.log(`[e] : ${e}`)
+                  // PARTIALLY_SHIPPING = "PARTIALLY_SHIPPING",
+                  // AWAITING_SHIPMENT = "AWAITING_SHIPMENT",
+                  // AWAITING_COLLECTION = "AWAITING_COLLECTION",
+                  // IN_TRANSIT = "IN_TRANSIT",
+                  // if (e === EnumTiktokOrderStatus.PARTIALLY_SHIPPING)
+                  const status = [
+                    EnumTiktokOrderStatus.AWAITING_SHIPMENT
+                    , EnumTiktokOrderStatus.AWAITING_SHIPMENT
+                    , EnumTiktokOrderStatus.IN_TRANSIT]
+
+                  const addMore = status.flatMap(s => ordersAllShop[s]) || []
+                  data.push(...addMore)
+
+                }
+                return (
+                  <TabsContent key={e} value={e}>
+                    {
+                      <DataTableForTiktok
+                        data={data}
+                        columns={TiktokOrderDetailsColumn}
+                        state={{
+                          columnVisibility: {
+                            on_server: !data.some(i => i && typeof i === "object" && (i.status === "UNPAID" || i.status === "ON_HOLD")),
+                            shippingProvider: !data.some(i => i && i.status === "ON_HOLD")
+                          }
+                        }}
+                      />
+
+                    }
+                  </TabsContent>
+                )
+              }) : (<SkeletonShopeeTable />)
+            }
+          </Tabs>
+          {DialogTiktokOrder}
+        </div>
 
         {/* <span>Tiktk</span> */}
-        <div className="flex flex-col w-full max-w-sm  items-center gap-2">
-          <Select onValueChange={(i) => {
-            const data = tiktokShop.find(t => t.ShopID === i)
-            if (data != undefined) setShopSelect(data)
-          }}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Shop" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Brands</SelectLabel>
-                {
-                  tiktokShop.map((i) => {
-                    return (
-                      <SelectItem key={`${i.ShopID}`} disabled={!i.IsActive} value={`${i.ShopID}`}>
-                        {i.ShopName}
-                      </SelectItem>
-                    )
-                  })
-                }
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+        <div>
+          <div className="flex flex-col w-full max-w-sm  items-start gap-2">
+            <Select onValueChange={(i) => {
+              const data = tiktokShop.find(t => String(t.ShopID) === i.trim());
+              if (data != undefined) setShopSelect(data)
+            }}>
 
-          <div className="w-full flex flex-row justify-center items-center gap-2">
-            <Input
-              value={orderID}
-              onChange={(e) => setOrderID(e.target.value.trim().replace(/\s+/g, ""))}
-              placeholder="Enter order ID"
-              className="border px-2 py-1"
-            />
-            <Button
-              onClick={SubmitSearch}
-              variant={"outline"}
-            >
-              <Search />
-            </Button>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Shop" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Brands</SelectLabel>
+                  {
+                    tiktokShop.map((i) => {
+                      return (
+                        <SelectItem key={`${i.ShopID} `} disabled={!i.IsActive} value={`${i.ShopID} `}>
+                          {i.ShopName}
+                        </SelectItem>
+                      )
+                    })
+                  }
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            <div className="w-full flex flex-row justify-center items-center gap-2">
+              <Input
+                value={orderID}
+                onChange={(e) => setOrderID(e.target.value.trim().replace(/\s+/g, "").replace(/,\s*$/, ""))}
+                placeholder="Enter order ID"
+                className="border px-2 py-1"
+              />
+              <Button
+                onClick={SubmitSearch}
+                variant={"outline"}
+              >
+                <Search />
+              </Button>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col w-full max-w-sm justify-center items-center gap-2">
 
-          {
-            orderList
-              ? (
-                orderList.map((i) => (
-                  <div
-                    key={`orl-${i.order_id}`}
-                    className="bg-white border border-gray-100 w-full min-h-[5rem] flex flex-row items-center justify-between px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-                  >
-                    {/* Left section */}
-                    <div className="flex flex-col gap-1">
-                      <span className="text-gray-900 font-semibold text-sm">
-                        {i.payment_method ?? "Unknown Payment"}
-                      </span>
-                      <div className="flex flex-row items-center gap-2 text-xs text-gray-600">
-                        <FileCheck2 className="w-4 h-4 text-green-500" />
-                        <span>{i.shipping_provider ?? "No Provider"}</span>
+          <div className="flex flex-col w-full max-w-sm justify-center items-center gap-2">
+            {
+              orderList
+                ? (
+                  orderList.map((i) => (
+                    <div
+                      key={`orl - ${i.order_id} `}
+                      className="bg-white border border-gray-100 w-full min-h-[5rem] flex flex-row items-center justify-between px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+                    >
+                      {/* Left section */}
+                      <div className="flex flex-col gap-2 justify-around items-start">
+                        {/* Shipping & Payment Info */}
+                        <div className="flex flex-col items-start gap-1 text-xs text-gray-600">
+                          <FileCheck2 className="w-4 h-4 text-green-500" />
+                          <span>{i.shipping_provider ?? "No Provider"}</span>
+                          <span className="text-gray-900 font-semibold text-sm">
+                            {i.payment_method ?? "Unknown Payment"}
+                          </span>
+                        </div>
+
+                        {/* B2C Status */}
+                        <div className="flex justify-center items-center p-2 bg-green-400 rounded-lg gap-2">
+                          {i.on_b2c ? (<><Archive className="text-white" size={14} /><span className="text-white text-[10px]">OnB2C</span></>) : null}
+                        </div>
+                      </div>
+                      {/* Right section */}
+                      <div className="flex flex-col justify-center items-end gap-1">
+                        <div className="border rounded-lg px-2">
+                          <span className="text-xs text-gray-500">
+                            Order: <span className="font-medium text-gray-800">{i.order_id}</span>
+                          </span>
+                        </div>
+
+                        {/* Status badge */}
+                        <div className="flex flex-row gap-2 justify-center items-center">
+
+
+
+                          <span
+                            className={`text-[11px] font-medium px-3 py-1 rounded-full border ${i.status === "CANCELLED"
+                              ? "bg-red-50 text-red-600 border-red-200"
+                              : i.status === "COMPLETED"
+                                ? "bg-green-50 text-green-600 border-green-200"
+                                : i.status === "IN_TRANSIT"
+                                  ? "bg-blue-50 text-blue-600 border-blue-200"
+                                  : "bg-gray-50 text-gray-600 border-gray-200"
+                              } `}
+                          >
+                            {i.status}
+                          </span>
+                        </div>
+
+                        {/* Packages as buttons */}
+                        {i.packages?.map((pkg) => (
+                          <div
+                            key={`pkg - ${pkg} `}
+                            className="flex flex-col"
+                          >
+                            <div
+                              className="flex flex-row gap-2 mt-1">
+                              <Button
+                                disabled={i.status === "IN_TRANSIT"}
+                                // key={`pck - ${ pkg } `}
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-auto"
+                                onClick={() => DowloadAWBDoc(i.order_id, pkg ?? "")}
+                              >
+                                <ReceiptText className="text-zinc-400" size={12} />
+                                {pkg}
+                              </Button>
+                            </div>
+
+                            <div className="flex flex-row gap-2 mt-1">
+                              <Button
+                                disabled={i.on_server}
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-xs px-2 py-1 h-auto"
+                                onClick={() => {
+                                  // toast.success(`Start upload : ${i.order_id}`)
+                                  UploadAWBDocToB2C(i.order_id, pkg ?? "", "")
+                                }}
+                              >
+                                <HardDriveUpload className="text-zinc-400" size={12} />
+                                {i.order_id}
+                              </Button>
+                            </div>
+
+
+
+
+                          </div>
+                        ))}
+
                       </div>
                     </div>
-
-                    {/* Right section */}
-                    <div className="flex flex-col justify-center items-end gap-1">
-                      <span className="text-xs text-gray-500">
-                        Order: <span className="font-medium text-gray-800">{i.order_id}</span>
-                      </span>
-
-                      {/* Status badge */}
-                      <span
-                        className={`text-[11px] font-medium px-3 py-1 rounded-full border ${i.status === "CANCELLED"
-                          ? "bg-red-50 text-red-600 border-red-200"
-                          : i.status === "COMPLETED"
-                            ? "bg-green-50 text-green-600 border-green-200"
-                            : i.status === "IN_TRANSIT"
-                              ? "bg-blue-50 text-blue-600 border-blue-200"
-                              : "bg-gray-50 text-gray-600 border-gray-200"
-                          }`}
-                      >
-                        {i.status}
-                      </span>
-
-                      {/* Packages as buttons */}
-                      {i.packages?.map((pkg) => (
-                        <div
-                          key={`pkg-${pkg}`}
-                          className="flex flex-col"
-                        >
-                          <div
-                            className="flex flex-row gap-2 mt-1">
-                            <Button
-                              disabled={i.status === "IN_TRANSIT"}
-                              // key={`pck-${pkg}`}
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="text-xs px-2 py-1 h-auto"
-                              onClick={() => DowloadAWBDoc(i.order_id, pkg ?? "")}
-                            >
-                              <ReceiptText className="text-zinc-400" size={12} />
-                              {pkg}
-                            </Button>
-                          </div>
-
-                          <div className="flex flex-row gap-2 mt-1">
-                            <Button
-                              disabled={i.on_server}
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="text-xs px-2 py-1 h-auto"
-                              onClick={() => UploadAWBDocToB2C(i.order_id, pkg ?? "")}
-                            >
-                              <HardDriveUpload className="text-zinc-400" size={12} />
-                              {i.order_id}
-                            </Button>
-                          </div></div>
-                      ))}
-
-                    </div>
-                  </div>
-                ))
-              )
-              : (<></>)}
+                  ))
+                )
+                : (<></>)}
+          </div>
         </div>
-        <Tabs
-          defaultValue="UNPAID"
-          className="w-full">
-          <TabsList className="grid w-full grid-cols-10">
-            {Object.values(EnumTiktokOrderStatus).filter(i => i != "UNKNOWN").map(e => {
-              const dataCount = ordersAllShop && ordersAllShop[e] ? ordersAllShop[e].length : null
-              return (
-                <TabsTrigger key={e} value={e.toString()} className="group">
-                  <span className="text-[12px]">{e.toString()}</span>
-                  <div className={`w-fit h-fit px-[6px] text-center font-bold text-[10px] bg-zinc-200 rounded-full text-white group-data-[state=active]:text-black`}>
-                    {dataCount}
-                  </div>
-                </TabsTrigger>
-              )
-            })}
-          </TabsList>
-
-          {ordersAllShop ?
-            Object.values(EnumTiktokOrderStatus).filter(i => i != "UNKNOWN").map(e => {
-              const data = ordersAllShop && ordersAllShop[e] ? ordersAllShop[e] : []
-
-              return (
-                <TabsContent key={e} value={e}>
-                  {
-                    <DataTableForTiktok
-                      data={data}
-                      columns={TiktokOrderDetailsColumn}
-                      state={{
-                        columnVisibility: {
-                          on_server: data.some(i => i.status === "UNPAID" || i.status === "ON_HOLD") ? false : true
-                        }
-                      }}
-                    />
-
-                  }
-                </TabsContent>
-              )
-            }) : (<SkeletonShopeeTable />)
-          }
-        </Tabs>
-        {DialogTiktokOrder}
       </main >
     </div >
   )

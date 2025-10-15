@@ -35,6 +35,7 @@ export interface IResTiktokOrderInformationAWB {
   cancel_reason: string | undefined
   canceled_time: Date | undefined
   on_server: boolean
+  on_b2c: boolean
 }
 
 function GenerateSignTiktok(url: URL, appSecret: string, body?: unknown) {
@@ -81,6 +82,8 @@ export async function GET(req: NextRequest) {
     if (resStore && resStore.length > 0) {
       const prom = resStore.map(async (i) => {
         const onServer = await prisma.b2C_OrderAWB.findFirst({ where: { OrderId: i.id }, orderBy: { CreationDate: "desc" }, select: { OrderId: true } })
+        const onB2C = await prisma.b2C_SalesOrderTable.findFirst({ where: { OrderId: i.id }, orderBy: { CreationDate: "desc" }, select: { OrderId: true } })
+        console.log(`[onB2C] : ${JSON.stringify(onB2C)}\n`)
         const res: IResTiktokOrderInformationAWB = {
           order_id: i.id ?? "",
           order_type: i.orderType,
@@ -98,7 +101,8 @@ export async function GET(req: NextRequest) {
           updated_time: i.updateTime ? new Date(i.updateTime) : undefined,
           cancel_reason: i.cancelReason,
           canceled_time: i.cancelTime ? new Date(i.cancelTime) : undefined,
-          on_server: (onServer && onServer?.OrderId.length > 0) ?? false
+          on_server: (onServer && onServer?.OrderId.length > 0) ?? false,
+          on_b2c: (onB2C && onB2C?.OrderId.length > 0) ?? false,
         }
         return res
       })

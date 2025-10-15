@@ -132,7 +132,9 @@ export function DataTableForTiktok<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id + "-" + header.index}>
+                    <TableHead
+                      className="text-[10px]"
+                      key={header.id + "-" + header.index}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -214,18 +216,18 @@ export function DataTableForTiktok<TData, TValue>({
         </Button>
 
 
-        <div className="flex items-center space-x-1 mt-2">
-          {Array.from({ length: table.getPageCount() }, (_, idx) => idx + 1).map((page) => (
-            <Button
-              key={page}
-              size="sm"
-              variant={table.getState().pagination.pageIndex + 1 === page ? "default" : "outline"}
-              onClick={() => table.setPageIndex(page - 1)}
-            >
-              {page}
-            </Button>
-          ))}
-        </div>
+        {/* <div className="flex items-center space-x-1 mt-2"> */}
+        {/*   {Array.from({ length: table.getPageCount() }, (_, idx) => idx + 1).map((page) => ( */}
+        {/*     <Button */}
+        {/*       key={page} */}
+        {/*       size="sm" */}
+        {/*       variant={table.getState().pagination.pageIndex + 1 === page ? "default" : "outline"} */}
+        {/*       onClick={() => table.setPageIndex(page - 1)} */}
+        {/*     > */}
+        {/*       {page} */}
+        {/*     </Button> */}
+        {/*   ))} */}
+        {/* </div> */}
 
         <Button
           variant="outline"

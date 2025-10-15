@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import pino from "pino";
 
 export type IResponse<T> = {
   status: number;
@@ -63,3 +64,16 @@ export class ResponseHandle {
   }
 
 }
+
+
+export const Lgr = pino({
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true
+    }
+  },
+  level: "debug"
+});
+
+

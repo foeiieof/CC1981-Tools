@@ -68,6 +68,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pac
     order_id: query.get("order_id") ?? undefined
   }
 
+  console.log(`[API-LOG] ${JSON.stringify(para)}\n`)
+
   if (!para.package_list
     || !para.access_token
     || !para.shop_cipher)
@@ -87,9 +89,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pac
         para.shop_cipher
       )
 
-    console.log(`[API] :${JSON.stringify(resFile.body.message)} \n`)
+    // console.log(`[API] :${JSON.stringify(resFile.body.message)} \n`)
     if (resFile.body.code != 0 && resFile.body?.message) {
-      return ResponseHandle.error(resFile.body.message, "[GET]-Tiktok_Order", 400)
+      return ResponseHandle.error("[GET]-Tiktok_Order", resFile.body.message, 400)
     }
 
     const urlPdf = resFile.body.data?.docUrl ?? ""
@@ -120,7 +122,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pac
 
     const uploaded = await prisma.b2C_OrderAWB.create({ data: data })
     if (uploaded.OrderId) {
-      return ResponseHandle.success(`Upload - ${para.order_id}`, "[POST]-Tiktok_Upload_AWB", 400)
+      return ResponseHandle.success(`Upload - ${para.order_id}`, "[POST]-Tiktok_Upload_AWB", 200)
     }
 
     return ResponseHandle.error(`Inomplete-Upload - ${para.order_id}`, "[POST]-TIktok_Upload_AWB", 400)
