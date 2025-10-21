@@ -4,7 +4,6 @@ import { PrismaClient } from "@prisma/client";
 import { EnumTiktokOrderStatus } from "../order-awb/route";
 import pino from "pino"
 import { HttpError } from "@/lib/sdk/tiktok/api";
-import { type } from "os";
 
 const prisma = new PrismaClient()
 
@@ -29,19 +28,18 @@ async function TiktokGetOrderListRecursive(para: {
     const res = await api.api.OrderV202309Api.OrdersSearchPost(100, para.shop_cipher ?? "", para.access_token ?? "", "application/json", "DESC", pgToken ?? "", "create_time", bd)
 
     // logger.debug({ type: typeof res.body.code, val: res.body.code, prooved: res.body.code === 0 })
-
     if (res.body.data && Number(res.body.code) === 0) {
       const data = res.body.data.orders ?? []
       store.push(...data ?? [])
       if (res.body.data.nextPageToken != "")
         return await TiktokGetOrderListRecursive(para, bd, store, res.body.data.nextPageToken)
     } else {
-      logger.debug(res.body.message, "[DEBUG]---")
+      // logger.debug(res.body.message, "[DEBUG]---")
     }
     return store
   } catch (err) {
     const error = err as HttpError
-    logger.error(bd, "[Error TiktokGetOrderListRecursive]")
+    logger.error({ body: bd, error: error.response }, "[Error TiktokGetOrderListRecursive]")
     return null
   }
 }

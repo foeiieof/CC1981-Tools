@@ -10,6 +10,7 @@ export default function NavComponent() {
   const links = [
     { name: 'Home', href: '/' },
     // { name: 'Employee', href: '/employee' },
+    { name: 'B2C', href: '/b2c' },
     { name: 'Campaign', href: '/campaign' },
     { name: 'Shopee', href: '/shopee' },
     { name: 'TikTok', href: '/tiktok' },

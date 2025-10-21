@@ -3,6 +3,7 @@ import crypto from "crypto"
 import { IResShopeeAPI, ResponseHandle } from "@/app/api/utility"
 import { NextRequest, NextResponse } from "next/server"
 import { EnumShopee_GetOrderList } from "../route"
+import { PrismaClient } from "@prisma/client"
 
 export interface IReqShopeeOrderDetails {
   shop_id: string
@@ -68,6 +69,8 @@ async function FetchShopeeGetOrderWithDetailsList(url: string) {
     return null
   }
 }
+
+const prisma = new PrismaClient()
 
 export async function POST(req: NextRequest) {
 
@@ -171,4 +174,92 @@ export async function POST(req: NextRequest) {
   return ResponseHandle.success(resOrderWithDetailsList, "[GET]api/Shopee/Order/details", 200, 0, 0, {
     headers: { "Cache-Control": "private, max-age=3600, stale-while-validate=60" }
   })
+}
+
+export async function GET(req: NextRequest) {
+
+  const query = req.nextUrl.searchParams
+
+  const shopQuerry = query.get("shop_id") ?? ""
+  const accessQuery = query.get("access_token") ?? ""
+
+  // Example : xxxx,xxxx
+  const orderListQuery = (query.get("order_list") ?? "").split(",")
+
+  // find in open api
+  const baseAPI = process.env.SHOPEE_BASE_API ?? "https://partner.shopeemobile.com"
+  const pathAPI = "/api/v2/order/get_order_detail"
+  const partnerID = process.env.SHOPEE_PARTNER_ID ?? "2003362"
+  const secretKey = process.env.SHOPEE_SECRET_KEY ?? undefined
+  const timestamp = Math.floor(new Date().getTime() / 1000)
+  if (shopQuerry === "" || accessQuery === "" || secretKey === undefined) return ResponseHandle.error("[GET]-api/shopee/order/details", "Bad request", 400)
+
+  const url = new URL(baseAPI)
+  url.pathname = pathAPI
+  url.searchParams.append("partner_id", partnerID)
+  url.searchParams.append("timestamp", timestamp.toString())
+  url.searchParams.append("shop_id", shopQuerry)
+  url.searchParams.append("access_token", accessQuery)
+
+  // generate sign
+  const baseSign = `${partnerID}${pathAPI}${timestamp}${accessQuery}${shopQuerry}`
+  const sign = crypto.createHmac("sha256", secretKey).update(baseSign).digest("hex")
+  url.searchParams.append("sign", sign)
+  url.searchParams.append("order_sn_list", orderListQuery.toString())
+
+
+  console.log("url to ShopeeAPI: ", url.toString())
+
+
+  try {
+    const res = await fetch(url.toString(), {
+      method: "GET", headers: { "Content-Type": "application/json" },
+    })
+
+
+
+    const data: IResShopeeAPI<{ order_list: IResShopee_GetOrderWithDetailsList_Struct[] }> = await res.json()
+    console.log("[POST] ShopeeOrderCheckStatus : ", data)
+    if (data.message != "") {
+      return ResponseHandle.error("error", `${data.message}`, 400)
+    }
+
+    // check on server
+    // if (data.response.result_list.length > 0) {
+    //   for (let i = 0; i < data.response.result_list.length; i++) {
+    //     const order = data.response.result_list[i]
+    //     const resServ = await prisma.b2C_OrderAWB.findFirst({
+    //       where: { OrderId: order.order_sn },
+    //       select: { OrderId: true }
+    //     })
+
+    //     if (resServ != null && resServ?.OrderId.length > 0) {
+    //       data.response.result_list[i].onServer = true
+    //     }
+    //   }
+    // }
+
+    const orderSNs = data.response.order_list.map(o => o.order_sn)
+    const existOrders = await prisma.b2C_SalesOrderTable.findMany({
+      where: { OrderId: { in: orderSNs } },
+      select: { OrderId: true, OrderStatus: true }
+    })
+
+    const existSet = new Map(existOrders.map(o => [o.OrderId, { status: o.OrderStatus }]))
+    data.response.order_list = data.response.order_list.map(o => ({
+      ...o,
+      b2cStatus: existSet.get(o.order_sn.toString())?.status
+    }))
+
+    // const init: ResponseInit = { }
+    return ResponseHandle.success(data.response.order_list, "succes-shopee-shop", 200, 0, 0, {
+      headers: {
+        "Cache-Control": "private, max-age=3600, stale-while-validate=60"
+      }
+    })
+
+  } catch {
+
+    return ResponseHandle.error("error", "[GET]api/Shopee/Order", 400)
+  }
 }

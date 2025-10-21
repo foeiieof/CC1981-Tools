@@ -19,14 +19,15 @@ export interface IResShopeeAPI<T = unknown> {
 }
 
 export class ResponseHandle {
-  static success<T>(data: T, message = "success", status?: number, total?: number, page?: number, opts?: ResponseInit) {
+  static success<T>(data: T, message = "success", status?: number, total?: number, page?: number, opts?: ResponseInit, other?: object) {
     const res: IResponse<T> = {
       status: (status ?? 200),
       data,
       count_data: Array.isArray(data) ? data.length : undefined,
       message,
       total_page: total,
-      current_page: page
+      current_page: page,
+      ...other
     }
 
     // const optReq: ResponseInit = opts != null

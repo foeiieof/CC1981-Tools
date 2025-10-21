@@ -7,10 +7,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { B2C_ChannelProcessWorkingSetup, B2C_ChannelTable } from "@prisma/client";
-import { Trash } from 'lucide-react'
+import { PencilRuler, Trash } from 'lucide-react'
 import { useState } from "react";
 import { formatInTimeZone } from "date-fns-tz"
 import DeleChannelDialog from "./DeleteChannelDialog";
+import UpdateChannelDialog, { EStateCreateChannelDialog } from "./UpdateChannelDialog";
 export type DayInfo = { name: string; style: string; }
 
 export const DaysMapWithColor: Record<string, DayInfo> = {
@@ -179,15 +180,27 @@ export default function CampaignTable(data: IReqCampaignTable) {
                   </TableCell>
                   <TableCell className="text-gray-400 hover:text-gray-600 hidden lg:table-cell">{item.Remark ?? "-"}</TableCell>
                   <TableCell className="flex flex-row gap-2 justify-center items-center">
+
+                    <div
+                      onClick={() => {
+                        setDataUpdate(item)
+                        setIsModal(true)
+                      }}
+                      className="flex justify-center items-center w-8 h-8 border hover:bg-black text-black hover:text-white rounded-md p-2 "
+                    >
+                      <PencilRuler size={16} />
+                    </div>
+
                     <div
                       onClick={() => {
                         setTargetDel(item.RecId)
                         setOpenDel(true)
                       }}
-
-                      className="flex justify-center items-center w-8 h-8 border hover:bg-black text-black hover:text-white rounded-md p-2 ">
+                      className="flex justify-center items-center w-8 h-8 border hover:bg-black text-black hover:text-white rounded-md p-2 "
+                    >
                       <Trash size={16} />
                     </div>
+
                   </TableCell>
                 </TableRow>
               )
@@ -196,7 +209,7 @@ export default function CampaignTable(data: IReqCampaignTable) {
       </Table >
 
       <DeleChannelDialog open={openDel} setOpen={setOpenDel} deleteId={targetDel} />
-      {/* <UpdateChannelDialog state={EStateCreateChannelDialog.UPDATE} table={data?.table} data={dataUpdate} open={isModal} onClose={() => { setIsModal(false) }} /> */}
+      <UpdateChannelDialog state={EStateCreateChannelDialog.UPDATE} table={data?.table} data={dataUpdate} open={isModal} onClose={() => { setIsModal(false) }} />
     </>
   )
 }
