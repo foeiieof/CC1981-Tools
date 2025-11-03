@@ -1,9 +1,9 @@
 import { ResponseHandle } from "../../utility"
 import { Order202309GetOrderListRequestBody, Order202309GetOrderListResponseDataOrders, TikTokShopNodeApiClient } from "@/lib/sdk/tiktok"
 import { PrismaClient } from "@prisma/client";
-import { EnumTiktokOrderStatus } from "../order-awb/route";
 import pino from "pino"
 import { HttpError } from "@/lib/sdk/tiktok/api";
+import { EnumTiktokOrderStatus } from "@/app/tiktok/page";
 
 const prisma = new PrismaClient()
 
@@ -46,22 +46,21 @@ async function TiktokGetOrderListRecursive(para: {
 
 
 // 580658142188241979
+// async function TiktokGetOrderDeatails(para: {
+//   shop_cipher: string | undefined; access_token: string | undefined;
+// }, store: Order202309GetOrderListResponseDataOrders[] = []) {
+//   const api = new TikTokShopNodeApiClient({ config: { app_key: process.env.TIKTOK_APP_ID, app_secret: process.env.TIKTOK_SECRET_KEY } })
+//   const res = await api.api.OrderV202507Api.OrdersGet(['580658142188241979'], para.shop_cipher ?? "", para.access_token ?? "", "application/json")
+//   if (res.body.data) {
 
-async function TiktokGetOrderDeatails(para: {
-  shop_cipher: string | undefined; access_token: string | undefined;
-}, store: Order202309GetOrderListResponseDataOrders[] = []) {
-  const api = new TikTokShopNodeApiClient({ config: { app_key: process.env.TIKTOK_APP_ID, app_secret: process.env.TIKTOK_SECRET_KEY } })
-  const res = await api.api.OrderV202507Api.OrdersGet(['580658142188241979'], para.shop_cipher ?? "", para.access_token ?? "", "application/json")
-  if (res.body.data) {
-
-    // console.log(`[Log] TiktokGetOrderDetails : ${JSON.stringify(res.body.data)}\n`)
-    const data = res.body.data.orders ?? []
-    store.push(...data ?? [])
-    // if (res.body.data.nextPageToken != "")
-    //   return await TiktokGetOrderListRecursive(para, bd, store, res.body.data.nextPageToken)
-  }
-  return store
-}
+//     // console.log(`[Log] TiktokGetOrderDetails : ${JSON.stringify(res.body.data)}\n`)
+//     const data = res.body.data.orders ?? []
+//     store.push(...data ?? [])
+//     // if (res.body.data.nextPageToken != "")
+//     //   return await TiktokGetOrderListRecursive(para, bd, store, res.body.data.nextPageToken)
+//   }
+//   return store
+// }
 
 export interface IResTiktokOrderSDK extends Order202309GetOrderListResponseDataOrders {
   shop_name?: string
@@ -97,8 +96,7 @@ export async function GET() {
     const shopStore = shopPromRes.filter(i => i.status === "fulfilled").map(s => s.value)
     const orderAllShopStore: Record<string, IResTiktokOrderSDK[]> = {}
     const orderProm = shopStore.map(async (i) => {
-      const stateFetch = Object.values(EnumTiktokOrderStatus)
-        .filter(s => s != "UNKNOWN")
+      const stateFetch = Object.values(EnumTiktokOrderStatus).filter(s => s != "UNKNOWN")
         // && s != "PRE_ORDER" && s != "UNPAID" && s != "CANCELLED" && s != "AWAITING_COLLECTION")
         .map(async (b) => {
           const para = { shop_cipher: i.shop_cipher, access_token: i.access_token }

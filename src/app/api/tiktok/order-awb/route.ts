@@ -1,4 +1,4 @@
-import { ResponseHandle } from "@/app/api/utility"
+import { EnumTiktokOrderStatus, ResponseHandle } from "@/app/api/utility"
 import { TikTokShopNodeApiClient } from "@/lib/sdk/tiktok";
 import { PrismaClient } from "@prisma/client";
 import { AxiosError } from "axios";
@@ -7,19 +7,6 @@ import { NextRequest } from "next/server";
 
 const prisma = new PrismaClient()
 
-export enum EnumTiktokOrderStatus {
-  CANCELLED = "CANCELLED",
-  UNPAID = "UNPAID",
-  ON_HOLD = "ON_HOLD",
-  COMPLETED = "COMPLETED",
-  DELIVERED = "DELIVERED",
-  PRE_ORDER = "PRE_ORDER",
-  IN_TRANSIT = "IN_TRANSIT",
-  AWAITING_COLLECTION = "AWAITING_COLLECTION",
-  AWAITING_SHIPMENT = "AWAITING_SHIPMENT",
-  PARTIALLY_SHIPPING = "PARTIALLY_SHIPPING",
-  UNKNOWN = "UNKNOWN"
-}
 
 export interface IResTiktokOrderInformationAWB {
   order_id: string
@@ -37,6 +24,8 @@ export interface IResTiktokOrderInformationAWB {
   on_server: boolean
   on_b2c: boolean
 }
+
+
 
 function GenerateSignTiktok(url: URL, appSecret: string, body?: unknown) {
   const sorted = Array.from(url.searchParams.entries()).sort(([a], [b]) => a.localeCompare(b));

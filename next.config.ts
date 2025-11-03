@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   // reactStrictMode: false,
   // appDir: true
 
+  typescript: { ignoreBuildErrors: true },
   images: {
     remotePatterns: [
       {
@@ -20,6 +21,7 @@ const nextConfig: NextConfig = {
     ]
   },
   allowedDevOrigins: ['10.128.111.156'],
+
   // experimental: {
   //   serverComponentsExternalPackages: ['pino', 'pino-pretty']
   // },

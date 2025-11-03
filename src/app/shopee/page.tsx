@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Copy, Download, FileCheck2, HardDriveUpload, MoreHorizontal, Search } from "lucide-react"
+import { BanknoteX, ClipboardCheck, ClipboardX, ClockArrowDown, Copy, Download, FileCheck2, HandHelping, HardDriveUpload, MoreHorizontal, Package, PackageOpen, Search, Truck } from "lucide-react"
 import useSWR from "swr"
 import {
   Select,
@@ -26,12 +26,11 @@ import {
 } from "@/components/ui/tabs"
 import Image from "next/image"
 import { useEffect, useMemo, useState } from 'react'
-import { IResponse } from "../api/utility"
+import { EnumShopee_GetOrderList, IResponse, Lgr } from "@/app/api/utility"
 import { IResShopeeTokenDetail } from "../api/shopee/shop/[shopID]/route"
 import { toast } from "sonner"
-import { EnumShopee_GetOrderList, IResShopee_GetOrderList_Struct, IResShopee_GetShippingDoc_Struct } from "../api/shopee/order/route"
 import { IResShopeeShopList } from "../api/shopee/shop/route"
-import { IResShopee_GetOrderWithDetailsList_Struct, IResShopee_GetOrderWithDetailsList_Struct_ItemList, ShopeeOrderRequestBody } from "../api/shopee/order/details/route"
+import { IResShopee_GetOrderWithDetailsList_Struct, IResShopee_GetOrderWithDetailsList_Struct_ItemList, ShopeeOrderRequestBody } from "@/app/api/shopee/order/details/route"
 import SkeletonShopeeTable from "./_components/SkeletonShopeeTable"
 import { ColumnDef } from "@tanstack/react-table"
 import OrderDetailsDialog from "./_components/DialogOrderDetails"
@@ -43,6 +42,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { DataTable } from "./_components/DataTable"
+import { IResShopee_GetOrderList_Struct, IResShopee_GetShippingDoc_Struct } from "@/app/api/shopee/order/route"
 //demo - data table 
 // async function getData(): Promise<Payment[]> {
 //   return [
@@ -79,7 +79,7 @@ import { DataTable } from "./_components/DataTable"
 
 async function FetchShopeeShopAccessTokenByShopID(shop: string): Promise<IResShopeeTokenDetail | null> {
   try {
-    const res = await fetch(`/api/shopee/shop/${shop}`)
+    const res = await fetch(`/api/shopee/shop/${shop}`, { cache: "no-cache" })
     const data: IResponse<IResShopeeTokenDetail> = await res.json()
     return data.data ?? null
   } catch (err) {
@@ -112,6 +112,8 @@ async function FetchShopeeLogisticShipDocResultByOrderSN(order: string[], shopID
 }
 
 type TypeFile = "PDF" | "ZIP" | "SERVER"
+
+
 
 async function FetchShopeeLogisticShipDocFileByOrderSN(order: string[], shopID: string, accessToken: string, type: TypeFile) {
   if (type != "PDF" && type != "ZIP" && type != "SERVER") {
@@ -148,6 +150,7 @@ const fetcherOrderDetails = async (key: [string, string]) => {
   });
   return res.json();
 };
+
 // core fun page
 export default function ShopeePage() {
   const [isLoadData, setIsLoadData] = useState(false)
@@ -250,7 +253,7 @@ export default function ShopeePage() {
         const data = (info.getValue() as string)
         return (
           <span className="max-w-16 text-balance">
-            {data}
+            {data.slice(0, 13)}
           </span>
         )
       }
@@ -350,7 +353,7 @@ export default function ShopeePage() {
   const { data: shopSelect } = useSWR(
     ["/api/shopee/shop", "GET"],
     async ([url, method]) => {
-      const res = await fetch(url, { method, cache: "force-cache" })
+      const res = await fetch(url, { method, cache: "no-cache" })
       const parse = (await res.json()) as IResponse<IResShopeeShopList[]>
       return parse.data
     },
@@ -369,6 +372,30 @@ export default function ShopeePage() {
     Array.isArray(orderStore[activeTab as EnumShopee_GetOrderList]) &&
     orderStore[activeTab as EnumShopee_GetOrderList]!.length > 0;
 
+  // for activetab
+  // const orderListPayload = useMemo(() => {
+  //   if (!shouldFetchOrderDetails) return null;
+  //   return JSON.stringify({
+  //     order_list: {
+  //       [activeTab as EnumShopee_GetOrderList]: orderStore[activeTab]
+  //     }
+  //   });
+  // }, [activeTab, orderStore, shouldFetchOrderDetails]);
+
+
+  // const { data: dataOrderListWithDetails, isLoading: isOrderDetailsLoading } = useSWR<IResponse<Record<string, { count: number, data: IResShopee_GetOrderWithDetailsList_Struct[] }>>>(
+  //   orderListPayload
+  //     ? ["/api/shopee/order/details", orderListPayload]
+  //     : null,
+  //   fetcherOrderDetails,
+  //   {
+  //     revalidateOnReconnect: false,
+  //     revalidateOnFocus: false,
+  //     refreshInterval: 0
+  //   }
+  // );
+
+  // for all
   const orderListPayload = useMemo(() => {
     if (!shouldFetchOrderDetails) return null;
     return JSON.stringify({
@@ -377,7 +404,6 @@ export default function ShopeePage() {
       }
     });
   }, [activeTab, orderStore, shouldFetchOrderDetails]);
-
 
   const { data: dataOrderListWithDetails, isLoading: isOrderDetailsLoading } = useSWR<IResponse<Record<string, { count: number, data: IResShopee_GetOrderWithDetailsList_Struct[] }>>>(
     orderListPayload
@@ -390,7 +416,6 @@ export default function ShopeePage() {
       refreshInterval: 0
     }
   );
-
 
 
   useEffect(() => {
@@ -566,6 +591,26 @@ export default function ShopeePage() {
 
   // const dialogMemo = useMemo(() => { return <OrderDetailsDialog data={selectOrder ?? undefined} state={[isModalOrderDetails, setIsModalOrderDetails]} /> }, [selectOrder])
 
+  const iconMapTiktok: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
+    UNPAID: BanknoteX,
+    READY_TO_SHIP: PackageOpen,
+    PROCESSED: Package,
+    SHIPPED: Truck,
+    COMPLETED: ClipboardCheck,
+    CANCELLED: ClipboardX
+  }
+
+  function TabIconTiktok({ tab, active = false }: { tab: string, active?: boolean }) {
+    const Icon = iconMapTiktok[tab] || BanknoteX
+    return (
+      <Icon
+        className={`w-5 h-5 transition-colors duration-200 ${active ? "text-zinc-600 stroke-[2.3]" : "text-zinc-400 stroke-[1.5]"
+          }`}
+      />
+
+    )
+  }
+
   const orderDialog = useMemo(() => {
     if (!selectOrder) return null
     return <OrderDetailsDialog data={selectOrder} state={[isModalOrderDetails, setIsModalOrderDetails]} />
@@ -709,23 +754,27 @@ export default function ShopeePage() {
         </div>
 
         <Tabs
+          value={activeTab}
           onValueChange={(val) => {
             setActiveTab(val as EnumShopee_GetOrderList)
           }}
           defaultValue="UNPAID"
           className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
-            {Object.values(EnumShopee_GetOrderList).map(e => {
-              const cc = dataOrderListWithCatagory?.data != null ? dataOrderListWithCatagory.data[e] : null
-              return (
-                <TabsTrigger key={e} value={e.toString()}>
-                  <span>{e.toString()}</span>
-                  <div className={`w-fit h-fit px-[6px] text-center font-bold text-[10px] bg-zinc-200 rounded-full ${activeTab === e ? "text-black" : "text-white"}`}>
-                    {cc?.count}
-                  </div>
-                </TabsTrigger>
-              )
-            })}
+          <TabsList className="grid w-full grid-cols-6">
+            {Object.values(EnumShopee_GetOrderList)
+              .filter(f => f.toUpperCase() != "IN_CANCEL")
+              .map(e => {
+                const cc = dataOrderListWithCatagory?.data != null ? dataOrderListWithCatagory.data[e] : null
+                return (
+                  <TabsTrigger key={e} value={e.toString()} className="group">
+                    <TabIconTiktok tab={e} active={activeTab === e} />
+                    <span className="text-[10px] text-zinc-400 group-data-[state=active]:text-black ">{e.toString()}</span>
+                    <div className={`w-fit h-fit px-[6px] text-center font-bold text-[10px] bg-zinc-200 rounded-full ${activeTab === e ? "text-black" : "text-white"}`}>
+                      {cc?.count}
+                    </div>
+                  </TabsTrigger>
+                )
+              })}
           </TabsList>
 
           {
@@ -733,20 +782,22 @@ export default function ShopeePage() {
               <SkeletonShopeeTable />
             )
               :
-              Object.values(EnumShopee_GetOrderList).map(state => {
-                const data = dataOrderListWithDetails?.data != null
-                  && dataOrderListWithDetails.data[state] != null
-                  ? dataOrderListWithDetails.data[state] : null
-                if (data?.data === undefined) { return }
-                return (
-                  <TabsContent key={state} value={state}>
-                    <DataTable
-                      data={data.data}
-                      columns={ShopeeOrderDetailsColumn} />
-                    {/* <DataTable columns={ShopeeOrderDetailsColumn} data={data?.data} /> */}
-                  </TabsContent>
-                )
-              })
+              Object.values(EnumShopee_GetOrderList)
+                .map(state => {
+                  const data = dataOrderListWithDetails?.data != null
+                    && dataOrderListWithDetails.data[state] != null
+                    ? dataOrderListWithDetails.data[state] : null
+                  if (data?.data === undefined) { return }
+                  // Lgr.info(dataOrderListWithDetails?.data, "[dataOrderListWithDetails]")
+                  return (
+                    <TabsContent key={state} value={state}>
+                      <DataTable
+                        data={data.data}
+                        columns={ShopeeOrderDetailsColumn} />
+                      {/* <DataTable columns={ShopeeOrderDetailsColumn} data={data?.data} /> */}
+                    </TabsContent>
+                  )
+                })
           }
         </Tabs>
         {orderDialog}

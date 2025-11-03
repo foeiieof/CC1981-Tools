@@ -1,21 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-import { IResShopeeAPI, ResponseHandle } from "@/app/api/utility"
+import { IResShopeeAPI, ResponseHandle, EnumShopee_GetOrderList } from "@/app/api/utility"
 import crypto from "crypto"
 import { PrismaClient } from "@prisma/client"
+
 
 export interface IResShopee_GetShippingDoc_Struct {
   order_sn: string
   status: "READY" | "FAILED" | "PROCESSING",
   onServer?: boolean
 }
-
-
-// interface IResShopAccess {
-//   ShopId: string
-//   CreationDate: Date
-//   AccessToken: string
-// }
-
 
 // for response json 
 export interface IResShopee_GetShippingDoc {
@@ -36,23 +29,6 @@ export interface IResShopee_GetOrderList {
   next_cursor: string
 }
 
-
-// interface IResGETOrderList {
-//   shop_id: string
-//   order_sn: string
-//   order_status?: string
-//   booking_sn: string
-// }
-
-export enum EnumShopee_GetOrderList {
-  UNPAID = "UNPAID",
-  READY_TO_SHIP = "READY_TO_SHIP",
-  PROCESSED = "PROCESSED",
-  SHIPPED = "SHIPPED",
-  COMPLETED = "COMPLETED",
-  IN_CANCEL = "IN_CANCEL",
-  CANCELLED = "CANCELLED"
-}
 
 const prisma = new PrismaClient()
 
@@ -185,13 +161,13 @@ export async function GET() {
 
     const promiseShopList = Object.values(shopListAccessResult).map(async (s) => {
       const promiseList = Object.values(EnumShopee_GetOrderList)
-        .filter(i => i != EnumShopee_GetOrderList.CANCELLED
-          && i != EnumShopee_GetOrderList.UNPAID
-          && i != EnumShopee_GetOrderList.COMPLETED
-          && i != EnumShopee_GetOrderList.SHIPPED
-          && i != EnumShopee_GetOrderList.PROCESSED
-          && i != EnumShopee_GetOrderList.IN_CANCEL
-        )
+        // .filter(i => i != EnumShopee_GetOrderList.CANCELLED
+        //   && i != EnumShopee_GetOrderList.UNPAID
+        //   && i != EnumShopee_GetOrderList.COMPLETED
+        //   && i != EnumShopee_GetOrderList.SHIPPED
+        //   && i != EnumShopee_GetOrderList.PROCESSED
+        //   && i != EnumShopee_GetOrderList.IN_CANCEL
+        // )
         .map(state =>
           ShopeeGetOrderListRecursive(s, state)
 

@@ -1,8 +1,7 @@
 import crypto from "crypto"
 
-import { IResShopeeAPI, ResponseHandle } from "@/app/api/utility"
+import { EnumShopee_GetOrderList, IResShopeeAPI, ResponseHandle } from "@/app/api/utility"
 import { NextRequest, NextResponse } from "next/server"
-import { EnumShopee_GetOrderList } from "../route"
 import { PrismaClient } from "@prisma/client"
 
 export interface IReqShopeeOrderDetails {
@@ -162,7 +161,7 @@ export async function POST(req: NextRequest) {
             data: [...resOrderWithDetailsList[state].data, ...newOrderList]
           }
         } else {
-          console.warn(`[fetch:ShopeeAPI]-OrderDetails :${idx} - ${res}`)
+          console.warn(`[fetch:ShopeeAPI]-OrderDetails :${idx} - ${JSON.stringify(res)}`)
         }
       })
     })

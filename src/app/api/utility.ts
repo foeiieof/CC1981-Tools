@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import pino from "pino";
+import type ResponseInit from "url"
+
 
 export type IResponse<T> = {
-  status: number;
+  status: number
   data?: T;
   count_data?: number
   message: string;
@@ -78,3 +80,27 @@ export const Lgr = pino({
 });
 
 
+export enum EnumShopee_GetOrderList {
+  UNPAID = "UNPAID",
+  READY_TO_SHIP = "READY_TO_SHIP",
+  PROCESSED = "PROCESSED",
+  SHIPPED = "SHIPPED",
+  COMPLETED = "COMPLETED",
+  IN_CANCEL = "IN_CANCEL",
+  CANCELLED = "CANCELLED"
+}
+
+
+export enum EnumTiktokOrderStatus {
+  CANCELLED = "CANCELLED",
+  UNPAID = "UNPAID",
+  ON_HOLD = "ON_HOLD",
+  COMPLETED = "COMPLETED",
+  DELIVERED = "DELIVERED",
+  PRE_ORDER = "PRE_ORDER",
+  IN_TRANSIT = "IN_TRANSIT",
+  AWAITING_COLLECTION = "AWAITING_COLLECTION",
+  AWAITING_SHIPMENT = "AWAITING_SHIPMENT",
+  PARTIALLY_SHIPPING = "PARTIALLY_SHIPPING",
+  UNKNOWN = "UNKNOWN"
+}
