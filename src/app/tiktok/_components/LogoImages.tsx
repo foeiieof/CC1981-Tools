@@ -1,5 +1,6 @@
 import { Store } from "lucide-react";
 import Image from "next/image";
+import { Lgr } from "@/app/api/utility";
 
 
 enum EnumBrandLogo {
@@ -9,7 +10,9 @@ enum EnumBrandLogo {
   Razer_Thailand = "RAZER THAILAND",
 }
 
-export function LogoImage({ brand }: { brand: string }) {
+export function TiktokLogoImages({ brand }: { brand: string }) {
+  Lgr.info({ brand: brand }, "brand:")
+
   let imgUrl: string;
   let imgAlt: string;
   switch (brand.trim().toUpperCase()) {

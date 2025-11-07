@@ -26,7 +26,7 @@ import {
 import useSWR from "swr"
 import { DataTableForTiktok } from "./_components/DataTableForTiktok"
 import { AxiosError } from "axios"
-import { LogoImage } from "./_components/LogoImage"
+import { TiktokLogoImages } from "./_components/LogoImages"
 // import { Checkbox } from "@/components/ui/checkbox"
 
 
@@ -277,7 +277,7 @@ export default function TiktokPage() {
       cell: ({ row }) => {
         const data = row.original
         return (
-          <LogoImage brand={(data && data.shop_name) ?? ""} />
+          <TiktokLogoImages brand={(data && data.shop_name) ?? ""} />
         )
       },
     },

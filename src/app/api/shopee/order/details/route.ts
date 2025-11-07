@@ -87,6 +87,14 @@ export async function POST(req: NextRequest) {
   const timestamp = Math.floor(new Date().getTime() / 1000)
 
 
+  const shopDetail = await prisma.shopee_ShopInfo.findMany({
+    where: { IsActive: true },
+    select: {
+      ShopId: true,
+      Shop_name: true
+    }
+  })
+
 
   const resOrderWithDetailsList: Record<string, { count: number, data: IResShopee_GetOrderWithDetailsList_Struct[] }> = {}
 
@@ -147,13 +155,19 @@ export async function POST(req: NextRequest) {
         // }
       }
 
+      const shopInfo = shopDetail.find(s => (s.ShopId.toString() === shop.shop_id))
+
       const resTask = await Promise.allSettled(tasks)
       resTask.forEach((res, idx) => {
         if (res.status === "fulfilled"
           && res.value?.response
           && res.value?.response.order_list.length > 0) {
           const newOrderList = res.value.response.order_list
-            .map(i => ({ ...i, shop_id: shop.shop_id }))
+            .map(i => ({
+              ...i,
+              shop_id: shop.shop_id,
+              shop_name: shopInfo?.Shop_name
+            }))
             .filter(o => !resOrderWithDetailsList[state].data.some(ext => ext.order_sn === o.order_sn))
 
           resOrderWithDetailsList[state] = {

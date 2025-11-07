@@ -43,6 +43,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { DataTable } from "./_components/DataTable"
 import { IResShopee_GetOrderList_Struct, IResShopee_GetShippingDoc_Struct } from "@/app/api/shopee/order/route"
+import { ShopeeLogoImages } from "./_components/ShopeeLogoImages"
+
 //demo - data table 
 // async function getData(): Promise<Payment[]> {
 //   return [
@@ -103,7 +105,7 @@ async function FetchShopeeLogisticShipDocResultByOrderSN(order: string[], shopID
     const res = await fetch(`/api/shopee/order?shop_id=${shopID}&access_token=${accessToken}`, init)
 
     const data: IResponse<IResShopee_GetShippingDoc_Struct[]> | null = await res.json()
-    console.log(data)
+    // console.log(data)
     return data?.data ?? new Error(data?.message)
   } catch (err: unknown) {
     // console.log(`fetch [FetchShopeeLogisticShipDocByOrderSN] : ${err}`)
@@ -171,10 +173,20 @@ export default function ShopeePage() {
   const [selectOrder, setSelectOrder] = useState<IResShopee_GetOrderWithDetailsList_Struct | null>(null)
 
   const ShopeeOrderDetailsColumn: ColumnDef<IResShopee_GetOrderWithDetailsList_Struct>[] = [
+    // {
+    //   accessorKey: "shop_id",
+    //   header: "Shop ID",
+    //   cell: info => info.getValue() ?? "-",
+    // },
     {
-      accessorKey: "shop_id",
-      header: "Shop ID",
-      cell: info => info.getValue() ?? "-",
+      accessorKey: "shop_name",
+      header: "Shop",
+      cell: (info) => {
+        const data = info.getValue() as string;
+        return (
+          <ShopeeLogoImages brand={(data && data.length > 1) ? data.toString() : ""} />
+        )
+      },
     },
     {
       accessorKey: "order_sn",
@@ -202,12 +214,8 @@ export default function ShopeePage() {
       cell: info => {
         const items = info.getValue() as IResShopee_GetOrderWithDetailsList_Struct_ItemList[];
         const item = items[0]
-
-        if (items && items[1])
-          console.log(items[1].item_id)
-
-
-
+        // if (items && items[1])
+        //   console.log(items[1].item_id)
         return (
           <div className="flex space-x-1">
             <Image
