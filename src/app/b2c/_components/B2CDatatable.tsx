@@ -51,6 +51,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { CalendarPicker } from "./CalendaPicker"
 import { toast } from "sonner"
+import { url } from "inspector"
 
 
 export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
@@ -193,7 +194,7 @@ function ModalB2COrderDetail({ order }: { order: B2CSaleOrderWithBrand }) {
   )
 }
 
-const fetcher = async (url: string): Promise<B2CSaleOrderWithBrand[] | null> => {
+const fetcher = async (url: URL): Promise<B2CSaleOrderWithBrand[] | null> => {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
 
@@ -204,7 +205,9 @@ const fetcher = async (url: string): Promise<B2CSaleOrderWithBrand[] | null> => 
 
 export function B2CDataTable() {
 
-  const [apiPath, setApiPath] = useState<string>('/api/b2c/order');
+  const [apiPath, setApiPath] = useState<URL>();
+  useEffect(() => { if (!apiPath) setApiPath(new URL('/api/b2c/order', window.location.origin)) }, [])
+
   const { data: orderData, isLoading, error } = useSWR(apiPath, fetcher, { refreshInterval: 0 });
 
 
@@ -231,20 +234,32 @@ export function B2CDataTable() {
     state: { sorting, columnFilters, columnVisibility, rowSelection, },
   })
 
+  const filterValue = (table.getColumn("OrderId")?.getFilterValue() as string) ?? "";
+  // Lgr.info({ filter: filterValue }, "Param: Filter")
 
   useEffect(() => {
-    if (startDate || endDate) {
-      let api = '/api/b2c/order'
-      Lgr.info({ length: api.length }, "length param")
-      if (startDate) {
-        api = (api.includes('?') ? api.concat('&') : api.concat('?')) + (startDate ? `start=${Math.floor(startDate.getTime() / 1000)}` : "")
-      }
-      if (endDate) {
-        api = (api.includes('?') ? api.concat('&') : api.concat('?')) + (endDate ? `end=${Math.floor(endDate.setHours(23, 59, 59) / 1000)}` : "")
-      }
+    if ((startDate || endDate) && apiPath) {
+      const api = new URL(apiPath?.toString())
+      if (startDate && api)
+        api.searchParams.set("start", String(Math.floor(startDate.getTime() / 1000)))
+
+      if (endDate && api)
+        api.searchParams.set("end", String(Math.floor(endDate.setHours(23, 59, 59) / 1000)))
+
+      Lgr.info({ param: endDate }, "Param : endDate")
       setTimeout(() => setApiPath(api), 1500)
     }
-  }, [apiPath, startDate, endDate])
+  }, [startDate, endDate])
+
+  // useEffect(() => {
+  //   const filteredRows = table.getFilteredRowModel().rows
+  //   Lgr.info({ value: filteredRows }, "table.getFilteredRowModel")
+  //   if (filterValue && filteredRows.length === 0) {
+  //     setApiPath((apiPath.includes('?') ? apiPath.concat('&') && apiPath.includes('order=') === false : apiPath.concat('?')) + (filterValue ? `order=${filterValue}` : apiPath + `,${filterValue}`))
+  //   }
+  // }, [filterValue])
+
+
 
   if (!orderData) return (< SkeletonOrderTable />)
 
@@ -255,7 +270,7 @@ export function B2CDataTable() {
           className="max-w-sm"
           placeholder="Order...?"
           value={(table.getColumn("OrderId")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("OrderId")?.setFilterValue(event.target.value)}
+          onChange={(event) => table.getColumn("OrderId")?.setFilterValue(event.target.value.trim())}
         />
 
         <CalendarPicker data={startDate} setData={setStartDate} topic="Start Date" />
@@ -385,7 +400,7 @@ export function B2CDataTable() {
           </Button>
         </div>
       </div>
-      <ModalB2COrderDetail order />
+      {/* <ModalB2COrderDetail order={} /> */}
       <Button onClick={() => Lgr.info({ date: startDate, type: typeof startDate }, "B2CDataTable")}>startDate</Button>
     </div>
   )
