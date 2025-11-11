@@ -654,7 +654,7 @@ export default function ShopeePage() {
 
           <div className="w-full flex flex-row justify-center items-center gap-2">
             <Input disabled={!shopeeShopSelect} type="text" placeholder="OrderSN" value={inputOrderSearch} onChange={(val) => {
-              const vals = val.target.value.trim()
+              const vals = val.target.value.trim().replaceAll(" ", ",")
               setInputOrderSearch(vals)
             }} />
             <Button variant="outline" onClick={async () => SeachSubmit()} disabled={(!shopeeShopSelect || !inputOrderSearch)}>

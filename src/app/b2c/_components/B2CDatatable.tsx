@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { ChevronDown, ChevronDownIcon, ShieldAlert } from "lucide-react"
+import { ChevronDown, ChevronDownIcon, Copy, MoreHorizontal, ReceiptText, ShieldAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -50,6 +50,7 @@ import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { CalendarPicker } from "./CalendaPicker"
+import { toast } from "sonner"
 
 
 export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
@@ -85,8 +86,19 @@ export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
       const message = String(row.original.MessageError ?? "");
 
       return (
+
         <div className="capitalize flex items-center gap-2">
-          {order}
+          <button
+            className="flex flex-row justify-center items-center gap-2 hover:bg-zinc-100  p-2 rounded-lg "
+            type="button"
+            onClick={() => {
+              toast.success(`Copy OrderSN : ${order}`)
+              navigator.clipboard.writeText(order)
+            }}
+          >
+            {order}
+            <Copy size={12} />
+          </button>
           {message && message !== "undefined" && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -124,7 +136,7 @@ export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
   {
     accessorKey: "LogisName",
     header: "Logistic",
-    cell: inf => inf.getValue()
+    cell: inf => String(inf.getValue()).slice(0, 13)
   },
   {
     accessorKey: "TotalAmount",
@@ -144,38 +156,42 @@ export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
         <span>{format(val, "dd/MM/yyyy HH:mm", { locale: th })}</span>
       )
     }
-  }
-  // {
-  //   id: "actions",
-  //   enableHiding: false,
-  //   cell: ({ row }) => {
-  //     const payment = row.original
+  },
+  {
+    id: "actions",
+    // header: "Actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const order = row.original
 
-  //     return (
-  //       <DropdownMenu>
-  //         <DropdownMenuTrigger asChild>
-  //           <Button variant="ghost" className="h-8 w-8 p-0">
-  //             <span className="sr-only">Open menu</span>
-  //             <MoreHorizontal />
-  //           </Button>
-  //         </DropdownMenuTrigger>
-  //         <DropdownMenuContent align="end">
-  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  //           <DropdownMenuItem
-  //             onClick={() => navigator.clipboard.writeText(payment.id)}
-  //           >
-  //             Copy payment ID
-  //           </DropdownMenuItem>
-  //           <DropdownMenuSeparator />
-  //           <DropdownMenuItem>View customer</DropdownMenuItem>
-  //           <DropdownMenuItem>View payment details</DropdownMenuItem>
-  //         </DropdownMenuContent>
-  //       </DropdownMenu>
-  //     )
-  //   },
-  // },
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem><ReceiptText size={13} />View Order details</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
+  },
 ]
 
+
+
+function ModalB2COrderDetail({ order }: { order: B2CSaleOrderWithBrand }) {
+  if (order)
+    Lgr.info({ data: order }, "ModalB2COrderDetail")
+  return (
+    <span> {order.OrderId} </span>
+  )
+}
 
 const fetcher = async (url: string): Promise<B2CSaleOrderWithBrand[] | null> => {
   const res = await fetch(url);
@@ -369,6 +385,7 @@ export function B2CDataTable() {
           </Button>
         </div>
       </div>
+      <ModalB2COrderDetail order />
       <Button onClick={() => Lgr.info({ date: startDate, type: typeof startDate }, "B2CDataTable")}>startDate</Button>
     </div>
   )

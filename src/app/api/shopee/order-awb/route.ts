@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import crypto from "crypto"
-import { ResponseHandle } from "@/app/api/utility"
+import { Lgr, ResponseHandle } from "@/app/api/utility"
 import { promisify } from "util"
 import stream from "stream"
 import archiver from "archiver"
@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
   url.searchParams.append("shop_id", shopQuerry)
   url.searchParams.append("access_token", accessQuery)
 
+  Lgr.info({ param: typeQuery }, "POST Shopee Doc")
   // generate sign
   const baseSign = `${partnerID}${pathAPI}${timestamp}${accessQuery}${shopQuerry}`
   const sign = crypto.createHmac("sha256", secretKey).update(baseSign).digest("hex")
@@ -176,7 +177,23 @@ export async function POST(req: NextRequest) {
         IsHaveAWB: true
       }
 
-      const resOn = await prisma.b2C_OrderAWB.create({ data: dataCreate, select: { OrderId: true } })
+
+      const uni: Prisma.B2C_OrderAWBWhereUniqueInput =
+        { ChannelId_OrderId_Seq: { OrderId: orderTarget.order_sn.toString(), ChannelId: 65, Seq: 1 } }
+
+      const resOn = await prisma.b2C_OrderAWB.upsert({
+        where: uni,
+        update: {
+          FileAttached: bff,
+          FileSize: bff.length,
+          ModifiedDate: new Date(),
+          SentDate: new Date(),
+          SentStatus: true,
+          IsHaveAWB: true,
+        },
+        create: dataCreate,
+        select: { OrderId: true }
+      })
 
       if (!resOn || !resOn.OrderId)
         return ResponseHandle.error("error", "error-shopee-shop-order-awb upload server failed", 400)
