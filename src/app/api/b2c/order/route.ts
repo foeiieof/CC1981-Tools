@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       cond.CreationDate = dateCond
     }
 
-    if (!startQ && !endQ)
+    if (!startQ && !endQ && !orderSN)
       cond.CreationDate = { gte: startOfDay(new Date()) }
 
     if (orderSN) {

@@ -289,22 +289,15 @@ export default function SeparateBillComponentModal({
                 <Button
                   onClick={() => onOpenChange(false)}
                   variant="outline">Cancle</Button>
-                {order && order.OrderId.includes("/")
-                  ? (
-                    <Button
-                      onClick={() => { }}
-                      variant="default"
-                    >Confirm Update Order</Button>
-                  ) : (
-                    <Button onClick={() => {
-                      if (onOrder && onOrder?.order_groups > 1) {
-                        UpdateSplitOrder(onOrder)
-                      }
-                      else { toast.error("Split Order Error",) }
-                    }
-                    }
-                      variant="default">Confirm Set Group</Button>
-                  )}
+
+                <Button onClick={() => {
+                  if (onOrder && onOrder?.order_groups > 1) {
+                    UpdateSplitOrder(onOrder)
+                  }
+                  else { toast.error("Split Order Error",) }
+                }
+                }
+                  variant="default">Confirm Set Group</Button>
               </DetailGrid>
             </CardSection>
 

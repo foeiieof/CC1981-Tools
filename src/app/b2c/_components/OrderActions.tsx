@@ -3,15 +3,15 @@
 import { useState } from "react"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, ReceiptText, TableColumnsSplit } from "lucide-react"
+import { CircleEllipsis, MoreHorizontal, ReceiptText, TableColumnsSplit } from "lucide-react"
 
 import { B2CSaleOrderWithBrand } from "@/app/api/types"
 import { OrderDetailComponentModal } from "./OrderDetail"
 import SeparateBillComponentModal from "./SeparateBillComponentModal"
 import { Lgr } from "@/app/api/utility"
+import UpdateOrderDetailsComponentModal from "./UpdateOrderDetails"
 // import { OrderDetailsModal } from "./order-details-modal"
 // import { SeparateBillModal } from "./separate-bill-modal"
-
 
 export interface IOrderGroup {
   order_sn: string;
@@ -32,6 +32,7 @@ const dat: IOrderGroup = {
 export function OrderActions({ order }: { order: B2CSaleOrderWithBrand }) {
   const [openDetails, setOpenDetails] = useState<boolean>(false)
   const [openSeparate, setOpenSeparate] = useState<boolean>(false)
+  const [openUpdate, setOpenUpdate] = useState<boolean>(false)
 
   const [dataGroup, setDateGroup] = useState<IOrderGroup | null>(null)
 
@@ -55,6 +56,10 @@ export function OrderActions({ order }: { order: B2CSaleOrderWithBrand }) {
             Separate bills
           </DropdownMenuItem>
 
+          <DropdownMenuItem onSelect={() => setOpenUpdate(true)}>
+            <CircleEllipsis size={13} />
+            Update Details Order
+          </DropdownMenuItem>
 
         </DropdownMenuContent>
       </DropdownMenu>
@@ -72,6 +77,15 @@ export function OrderActions({ order }: { order: B2CSaleOrderWithBrand }) {
         onOrder={dataGroup}
         onIncreaseOrder={setDateGroup}
       />
+
+
+
+      <UpdateOrderDetailsComponentModal
+        order={order}
+        open={openUpdate}
+        onOpenChange={setOpenUpdate}
+      />
+
     </>
   )
 }
