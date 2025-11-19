@@ -137,11 +137,11 @@ function SelecSubGroupComponent({ sku, setState, limit, order }: { sku: string, 
 
   // if (order) { Lgr.info({ data: order.split("/")[1], ori: order }, "logs") }
   useEffect(() => {
-    if (order) setSelected((order.split("/")[1]))
+    if (val) setSelected((val))
   }, [])
 
   return (
-    <Select value={select} onValueChange={setSelected} disabled={typeof order != undefined}>
+    <Select value={select} onValueChange={setSelected} disabled={val != undefined}>
       <SelectTrigger className="w-full max-w-[160px]">
         <SelectValue placeholder="Select group" />
       </SelectTrigger>
