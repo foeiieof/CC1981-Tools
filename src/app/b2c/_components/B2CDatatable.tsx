@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { ChevronDown, ChevronDownIcon, Copy, MoreHorizontal, ReceiptText, ShieldAlert } from "lucide-react"
+import { ChevronDown, Copy, ShieldAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -36,7 +36,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { B2C_SalesOrderTable } from "@prisma/client"
 import { B2CSaleOrderWithBrand } from "@/app/api/types"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
@@ -46,12 +45,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useEffect, useState } from "react"
 import useSWR from "swr"
 import SkeletonOrderTable from "./SkeletonOrderTable"
-import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
 import { CalendarPicker } from "./CalendaPicker"
 import { toast } from "sonner"
-import { url } from "inspector"
+import { OrderActions } from "./OrderActions"
 
 
 export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
@@ -140,7 +136,7 @@ export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
     cell: inf => String(inf.getValue()).slice(0, 13)
   },
   {
-    accessorKey: "TotalAmount",
+    accessorKey: "PaidAmount",
     header: "TotalAmount",
     cell: ({ getValue }) => {
       const raw = getValue() ?? 0;
@@ -164,22 +160,7 @@ export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const order = row.original
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem><ReceiptText size={13} />View Order details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+      return (<OrderActions order={order} />)
     },
   },
 ]
@@ -195,6 +176,8 @@ function ModalB2COrderDetail({ order }: { order: B2CSaleOrderWithBrand }) {
 }
 
 const fetcher = async (url: URL): Promise<B2CSaleOrderWithBrand[] | null> => {
+  const headCon: RequestInit = {}
+  if (url.searchParams.get("order_sn")) headCon.cache = "no-store"
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
 
@@ -208,7 +191,7 @@ export function B2CDataTable() {
   const [apiPath, setApiPath] = useState<URL>();
   useEffect(() => { if (!apiPath) setApiPath(new URL('/api/b2c/order', window.location.origin)) }, [])
 
-  const { data: orderData, isLoading, error } = useSWR(apiPath, fetcher, { refreshInterval: 0 });
+  const { data: orderData, isLoading, error, mutate } = useSWR(apiPath, fetcher, { refreshInterval: 0 });
 
 
   // params
@@ -238,6 +221,7 @@ export function B2CDataTable() {
   // Lgr.info({ filter: filterValue }, "Param: Filter")
 
   useEffect(() => {
+
     if ((startDate || endDate) && apiPath) {
       const api = new URL(apiPath?.toString())
       if (startDate && api)
@@ -245,19 +229,33 @@ export function B2CDataTable() {
 
       if (endDate && api)
         api.searchParams.set("end", String(Math.floor(endDate.setHours(23, 59, 59) / 1000)))
-
       Lgr.info({ param: endDate }, "Param : endDate")
-      setTimeout(() => setApiPath(api), 1500)
+
+      if (startDate && endDate && (startDate > endDate)) {
+        setStartDate(undefined)
+        setEndDate(undefined)
+        toast.error("Invalid StartDate or EndDate", { description: "Please check again!" })
+        // setApiPath(new URL('/api/b2c/order', window.location.origin))
+      } else {
+        setTimeout(() => setApiPath(api), 1000)
+      }
     }
   }, [startDate, endDate])
 
-  // useEffect(() => {
-  //   const filteredRows = table.getFilteredRowModel().rows
-  //   Lgr.info({ value: filteredRows }, "table.getFilteredRowModel")
-  //   if (filterValue && filteredRows.length === 0) {
-  //     setApiPath((apiPath.includes('?') ? apiPath.concat('&') && apiPath.includes('order=') === false : apiPath.concat('?')) + (filterValue ? `order=${filterValue}` : apiPath + `,${filterValue}`))
-  //   }
-  // }, [filterValue])
+
+  // Check valid date
+
+  useEffect(() => {
+    const filteredRows = table.getFilteredRowModel().rows
+    // Lgr.info({ value: filteredRows }, "table.getFilteredRowModel")
+    if (filterValue && filteredRows.length === 0) {
+      apiPath?.searchParams.set("order_sn", filterValue)
+      mutate()
+    } else {
+      setApiPath(new URL('/api/b2c/order', window.location.origin))
+      mutate()
+    }
+  }, [filterValue])
 
 
 
@@ -400,8 +398,6 @@ export function B2CDataTable() {
           </Button>
         </div>
       </div>
-      {/* <ModalB2COrderDetail order={} /> */}
-      <Button onClick={() => Lgr.info({ date: startDate, type: typeof startDate }, "B2CDataTable")}>startDate</Button>
     </div>
   )
 }

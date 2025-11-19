@@ -16,9 +16,8 @@ export async function GET(req: NextRequest) {
 
     const startQ = query.get("start") ?? undefined
     const endQ = query.get("end") ?? undefined
+    const orderSN = query.get("order_sn") ?? undefined
 
-    // const awb = await prisma
-    // if (!Number.isFinite(pageQ) || !Number.isFinite(sizeQ) || !Number.isFinite(yearQ)) return ResponseHandle.error("[B2C] GetOrder", "Invalid page/size", 400);
     const [page, limit, year] = [Math.floor(pageQ ?? 1), Math.floor(sizeQ), yearQ === 0 ? (new Date().getFullYear()) : yearQ]
 
     const cond: Prisma.B2C_SalesOrderTableWhereInput = {}
@@ -33,6 +32,14 @@ export async function GET(req: NextRequest) {
         dateCond.lte = new Date(Number(endQ) * 1000)
       }
       cond.CreationDate = dateCond
+    }
+
+    if (orderSN) {
+      if (orderSN.includes("/")) {
+        cond.OrderId = { contains: orderSN.split("/")[0] }
+      } else {
+        cond.OrderId = orderSN
+      }
     }
 
     Lgr.info({ cond: cond, page: page, limit: limit }, "[API]-TIME")
