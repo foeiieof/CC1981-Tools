@@ -1,8 +1,8 @@
 import { B2C_SalesOrderTable_History, Prisma, PrismaClient } from "@prisma/client"
 import { NextRequest } from "next/server"
 import { IResponse, Lgr, ResponseHandle } from "../../utility"
+import { endsWith } from "zod"
 import { startOfDay } from "date-fns"
-import { unknown } from "zod"
 
 const prisma = new PrismaClient({ transactionOptions: { timeout: 30 } })
 
@@ -10,8 +10,8 @@ export async function GET(req: NextRequest) {
   try {
     const date = new Date()
     const query = req.nextUrl.searchParams
-    const pageQ = Number(query.get("page") ?? 1)
-    const sizeQ = Number(query.get("size") ?? 100)
+    const pageQ = Number(query.get("page") ?? undefined)
+    const sizeQ = Number(query.get("size") ?? undefined)
     const yearQ = Number(query.get("year") ?? date.getFullYear())
 
     const startQ = query.get("start") ?? undefined
@@ -34,6 +34,9 @@ export async function GET(req: NextRequest) {
       cond.CreationDate = dateCond
     }
 
+    if (!startQ && !endQ)
+      cond.CreationDate = { gte: startOfDay(new Date()) }
+
     if (orderSN) {
       if (orderSN.includes("/")) {
         cond.OrderId = { contains: orderSN.split("/")[0] }
@@ -50,6 +53,7 @@ export async function GET(req: NextRequest) {
       pagi.take = limit
     }
 
+    // pagi.take = 100
     const [data, count, channel] = await Promise.all([
       prisma.b2C_SalesOrderTable.findMany({
         where: cond,

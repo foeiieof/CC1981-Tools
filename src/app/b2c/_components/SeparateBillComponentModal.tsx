@@ -97,7 +97,7 @@ function SelecGroupComponent({ setState, limit, order }: { setState: Dispatch<Se
 
 
   useEffect(() => {
-    Lgr.info({ data: val }, "logs")
+    // Lgr.info({ data: val }, "logs")
     if (val) setSelected(val)
   }, [val])
 
@@ -203,7 +203,7 @@ export default function SeparateBillComponentModal({
 
       (async () => {
         const res = await FetchOrderDetail(order.OrderId)
-        Lgr.info({ data: JSON.stringify(res) }, "fetchOrderDetail")
+        // Lgr.info({ data: JSON.stringify(res) }, "fetchOrderDetail")
         if (res && res.length > 0)
           setDetail(res)
         return
