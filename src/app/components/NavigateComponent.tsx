@@ -36,76 +36,101 @@ function ListItem({
   )
 }
 
+interface INavs {
+  name: string;
+  href: string;
+  desc?: string;
+  subgroups?: INavs[]
+}
+
 export default function NavComponent() {
   // const pathName = usePathname()
 
-  const links = [
+  const links: INavs[] = [
     { name: 'Home', href: '/' },
-    // { name: 'Employee', href: '/employee' },
-    { name: 'B2C', href: '/b2c' },
-    { name: 'Campaign', href: '/campaign' },
+    {
+      name: 'B2C',
+      href: '/b2c',
+      subgroups: [
+        {
+          name: 'Campaign',
+          href: '/campaign',
+          desc: 'Setup and Show all campaign'
+        },
+        {
+          name: 'Order management',
+          href: '/b2c',
+          desc: 'Actions Order '
+        },
+        {
+          name: 'Platform console',
+          href: '/b2c',
+          desc: 'Orgazines your all platform and process works'
+        },
+
+      ]
+    },
+    // { name: 'Campaign', href: '/campaign' },
     { name: 'Shopee', href: '/shopee' },
     { name: 'TikTok', href: '/tiktok' },
     { name: 'Tools', href: '/tools' },
-    // { name: 'Sign in', href: '/register' },
-    // { name: 'Sign up', href: '/login' }
   ]
-  const components: { title: string; href: string; description: string }[] = [
-    {
-      title: "Alert Dialog",
-      href: "/docs/primitives/alert-dialog",
-      description:
-        "A modal dialog that interrupts the user with important content and expects a response.",
-    },
-    {
-      title: "Hover Card",
-      href: "/docs/primitives/hover-card",
-      description:
-        "For sighted users to preview content available behind a link.",
-    },
-    {
-      title: "Progress",
-      href: "/docs/primitives/progress",
-      description:
-        "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
-    },
-    {
-      title: "Scroll-area",
-      href: "/docs/primitives/scroll-area",
-      description: "Visually or semantically separates content.",
-    },
-    {
-      title: "Tabs",
-      href: "/docs/primitives/tabs",
-      description:
-        "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
-    },
-    {
-      title: "Tooltip",
-      href: "/docs/primitives/tooltip",
-      description:
-        "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
-    },
-  ]
+
 
   const pathName = usePathname()
   const isMobile = useIsMobile()
 
   return (
-    <NavigationMenu className='mx-auto p-4' viewport={isMobile}>
+    <NavigationMenu className='mx-auto p-4 z-50' viewport={isMobile}>
       <NavigationMenuList className='flex-wrap'>
 
-        {links.map((i) => {
-          return (
-            <NavigationMenuItem key={`key-${i.name}`} className='[&_[data-active]]:font-bold [&_[data-active]]:bg-accent'>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()} active={pathName === i.href}>
-                <Link href={i.href} className=''>
-                  <span className=""> {i.name} </span>
-                </Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          )
-        })}
+        {
+          links.map((i) => {
+            if (i.subgroups) {
+              return (
+                <NavigationMenuItem className="hidden md:block" key={`navsub-${i.name}`}>
+                  <NavigationMenuTrigger>{i.name}</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[300px] gap-4">
+                      <li>
+                        {
+                          i.subgroups.map((n, i) => {
+                            return (
+                              <NavigationMenuLink key={`sub-${i}-${n.name}`} asChild>
+                                <Link href={n.href}>
+                                  <div className="font-medium">{n.name}</div>
+                                  {
+                                    n.desc ? (
+                                      <div className="text-muted-foreground"> {n.desc}</div>
+
+                                    ) : (
+                                      ""
+                                    )
+                                  }
+                                </Link>
+                              </NavigationMenuLink>
+
+                            )
+                          })
+                        }
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+
+              )
+            }
+            return (
+              <NavigationMenuItem key={`key-${i.name}`} className='[&_[data-active]]:font-bold [&_[data-active]]:bg-accent'>
+                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()} active={pathName === i.href}>
+                  <Link href={i.href} className=''>
+                    <span className=""> {i.name} </span>
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            )
+          })}
 
       </NavigationMenuList>
     </NavigationMenu>

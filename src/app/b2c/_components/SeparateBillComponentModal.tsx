@@ -177,17 +177,19 @@ export default function SeparateBillComponentModal({
 
   async function UpdateSplitOrder(data: IOrderGroup) {
     try {
+      setOnSpinner(true)
       if (!data.order_sn || Object.entries(data.order_group_items).length < 1)
         return toast.error("Split Order Error", { description: `Order ${order.OrderId} ` })
       const res = await PostSeparateOrderDetail(data) as IResponse<unknown>
-
+      setOnSpinner(false)
       if (res.error)
-        return toast.error("Split Order Complete", { description: "" })
+        return toast.error("Split Order Complete", { description: res.message })
 
       return toast.success("Split Order Complete", { description: JSON.stringify(res.data) })
     } catch {
       return toast.error("Split Order Complete", { description: "try again" })
     }
+
   }
 
   useEffect(() => {
@@ -291,14 +293,16 @@ export default function SeparateBillComponentModal({
                   onClick={() => onOpenChange(false)}
                   variant="outline">Cancle</Button>
 
+
                 <Button onClick={() => {
+                  setOnSpinner(true)
                   if (onOrder && onOrder?.order_groups > 1) {
                     UpdateSplitOrder(onOrder)
                   }
                   else { toast.error("Split Order Error",) }
                 }
                 }
-                  variant="default">Confirm Set Group</Button>
+                  variant="default">{onSpinner ? <Spinner className="self-center" /> : "Confirm Set Group"}</Button>
               </DetailGrid>
             </CardSection>
 
