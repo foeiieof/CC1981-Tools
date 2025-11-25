@@ -3,13 +3,14 @@
 import { useState } from "react"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { CircleEllipsis, MoreHorizontal, ReceiptText, TableColumnsSplit } from "lucide-react"
+import { CircleEllipsis, ClipboardPlus, MoreHorizontal, ReceiptText, TableColumnsSplit } from "lucide-react"
 
 import { B2CSaleOrderWithBrand } from "@/app/api/types"
 import { OrderDetailComponentModal } from "./OrderDetail"
 import SeparateBillComponentModal from "./SeparateBillComponentModal"
 import { Lgr } from "@/app/api/utility"
 import UpdateOrderDetailsComponentModal from "./UpdateOrderDetails"
+import AddItemsOrderComponentModal from "./AddItemsOrder"
 // import { OrderDetailsModal } from "./order-details-modal"
 // import { SeparateBillModal } from "./separate-bill-modal"
 
@@ -33,6 +34,7 @@ export function OrderActions({ order }: { order: B2CSaleOrderWithBrand }) {
   const [openDetails, setOpenDetails] = useState<boolean>(false)
   const [openSeparate, setOpenSeparate] = useState<boolean>(false)
   const [openUpdate, setOpenUpdate] = useState<boolean>(false)
+  const [openAddItem, setAddIten] = useState<boolean>(false)
 
   const [dataGroup, setDateGroup] = useState<IOrderGroup | null>(null)
 
@@ -61,6 +63,11 @@ export function OrderActions({ order }: { order: B2CSaleOrderWithBrand }) {
             Update Details Order
           </DropdownMenuItem>
 
+          <DropdownMenuItem onSelect={() => setAddIten(true)}>
+            <ClipboardPlus size={13} />
+            Add Items
+          </DropdownMenuItem>
+
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -78,12 +85,10 @@ export function OrderActions({ order }: { order: B2CSaleOrderWithBrand }) {
         onIncreaseOrder={setDateGroup}
       />
 
-
-
-      <UpdateOrderDetailsComponentModal
+      <AddItemsOrderComponentModal
         order={order}
-        open={openUpdate}
-        onOpenChange={setOpenUpdate}
+        open={openAddItem}
+        onOpenChange={setAddIten}
       />
 
     </>

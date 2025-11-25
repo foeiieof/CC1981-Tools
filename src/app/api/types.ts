@@ -10,3 +10,8 @@ export interface IReqOrderGroup {
   order_groups: number;
   order_group_items: Record<string, number>
 }
+
+export interface IReqOrderGroupUpdate {
+  order_sn: string;
+  order_list_items: Record<string, number>
+}

@@ -1,7 +1,8 @@
-import { IReqOrderGroup } from "@/app/api/types"
+import { IReqOrderGroup, IReqOrderGroupUpdate } from "@/app/api/types"
 import { IResponse, Lgr, ResponseHandle } from "@/app/api/utility"
-import { Prisma, PrismaClient } from "@prisma/client"
+import { B2C_SalesOrderLine, Prisma, PrismaClient } from "@prisma/client"
 import { DefaultArgs } from "@prisma/client/runtime/library"
+import { Wheat } from "lucide-react"
 import { NextRequest } from "next/server"
 
 const prisma = new PrismaClient()
@@ -90,6 +91,34 @@ export async function POST(req: NextRequest) {
     // 2.b2c_saleOrderTable
 
   } catch (error) {
+    const err = error as IResponse<unknown>
+    Lgr.error({ message: err.message }, "[API] GetB2COrder")
+    return ResponseHandle.error("[Tiktok] GetOrderAWB", err.message, 400)
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const query: IReqOrderGroupUpdate = await req.json()
+    if (!query.order_sn || !query.order_list_items) return ResponseHandle.error('params is required', "orderSN not found")
+    Lgr.info({ data: query }, "[PATCH]-Params in API")
+    // const condOrderLineWhere: Prisma.B2C_SalesOrderLineWhereInput = { OrderId: { in: [query.order_sn] } }
+
+    const updateLists =
+      Object.entries(query.order_list_items).map(async ([k, v]) => {
+        const data = await prisma.b2C_SalesOrderLine.findFirstOrThrow({ where: { OrderId: query.order_sn, ItemSKU: k } })
+        if (!data) return null;
+
+        const update: Prisma.B2C_SalesOrderLineWhereUniqueInput = { ChannelId_OrderId_Seq: { ChannelId: data.ChannelId, OrderId: data.OrderId, Seq: data.Seq } }
+        const res = await prisma.b2C_SalesOrderLine.update({ where: update, data: { Seq: v } })
+        return res
+      })
+
+    const res = (await Promise.all(updateLists)).filter(Boolean)
+
+    return ResponseHandle.success(res, `Update OrderItems in Order : ${query.order_sn}`)
+  }
+  catch (error) {
     const err = error as IResponse<unknown>
     Lgr.error({ message: err.message }, "[API] GetB2COrder")
     return ResponseHandle.error("[Tiktok] GetOrderAWB", err.message, 400)

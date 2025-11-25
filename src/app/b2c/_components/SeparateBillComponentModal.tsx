@@ -13,7 +13,7 @@ import { B2CSaleOrderWithBrand } from "@/app/api/types"
 import React, { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import { Blocks, Info, X } from "lucide-react";
 import { B2C_SalesOrderLine } from "@prisma/client";
-import { IResponse, Lgr } from "@/app/api/utility";
+import { IResponse } from "@/app/api/utility";
 import {
   Select,
   SelectContent,
@@ -25,8 +25,8 @@ import {
 } from "@/components/ui/select"
 import { IOrderGroup } from "./OrderActions";
 import { toast } from "sonner";
-import { type } from "os";
 import { Input } from "@/components/ui/input";
+import { Spinner } from '@/components/ui/shadcn-io/spinner';
 
 function CardSection({ title, icon, children }: { title: string, icon: ReactNode, children: ReactNode }) {
   return (
@@ -103,7 +103,7 @@ function SelecGroupComponent({ setState, limit, order }: { setState: Dispatch<Se
 
   const numOption = Array.from({ length: val ? Number(val) : (limit ? limit : 5) }, (_, i) => i + 1)
   return (
-    <Select value={select} onValueChange={setSelected} disabled={val != undefined} >
+    <Select value={select} onValueChange={setSelected} disabled={val != undefined || numOption.length < 2} >
       <SelectTrigger className="w-full max-w-[160px]">
         <SelectValue placeholder="Select group" />
       </SelectTrigger>
@@ -141,7 +141,7 @@ function SelecSubGroupComponent({ sku, setState, limit, order }: { sku: string, 
   }, [])
 
   return (
-    <Select value={select} onValueChange={setSelected} disabled={val != undefined}>
+    <Select value={select} onValueChange={setSelected} disabled={val != undefined || numOption.length < 2}>
       <SelectTrigger className="w-full max-w-[160px]">
         <SelectValue placeholder="Select group" />
       </SelectTrigger>
@@ -173,6 +173,7 @@ export default function SeparateBillComponentModal({
 
   const [detail, setDetail] = useState<B2C_SalesOrderLine[]>()
   const [mounted, setMounted] = useState<boolean>(false)
+  const [onSpinner, setOnSpinner] = useState<boolean>(false)
 
   async function UpdateSplitOrder(data: IOrderGroup) {
     try {

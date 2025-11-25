@@ -59,7 +59,7 @@ async function PathOrderDetail(list: IReqOrderGroupUpdate) {
 
 
 
-export default function UpdateOrderDetailsComponentModal({
+export default function AddItemsOrderComponentModal({
   order,
   open,
   onOpenChange,
@@ -105,35 +105,7 @@ export default function UpdateOrderDetailsComponentModal({
   }, [mounted, open])
 
   // fn 
-  async function UpdateOrderSeq(): Promise<void> {
-    setOnSpinner(true)
-    const dataBody: IReqOrderGroupUpdate = { order_sn: order.OrderId, order_list_items: {} }
-    if (!dataDetails) {
-      toast.error("Error Param", { description: "Data invalidate" })
-      return;
-    }
-    dataBody.order_list_items = { ...dataDetails }
 
-    const res = await PathOrderDetail(dataBody)
-    if (res.error) {
-      setOnSpinner(false)
-      toast.error("Error Update Data", { description: res.message })
-    }
-
-    if (res.data) {
-      const sku = res.data.reduce<string[]>((acc, i) => {
-        if (i.ItemSKU) acc.push(String(i.ItemSKU));
-        return acc;
-      }, [])
-      setDetail(res.data)
-      setOnSpinner(false)
-      toast.success("Update Data", { description: `Item SKU : ${sku.join(",")}` })
-    }
-
-    // Debug
-    // toast.success("Update Data", { description: `Item SKU : ${JSON.stringify(dataBody)}` })
-    // setOnSpinner(false)
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -144,7 +116,7 @@ export default function UpdateOrderDetailsComponentModal({
         {/* Header */}
         <DialogHeader className="sticky top-0 z-20 bg-background border-b px-4 py-2">
           <DialogTitle className="text-lg font-semibold">
-            Seperate Bill — {order.OrderId}
+            Add Items — {order.OrderId}
           </DialogTitle>
           <DialogDescription>
             Make changes to your profile here. Click save when you&apos;re done.
@@ -204,7 +176,7 @@ export default function UpdateOrderDetailsComponentModal({
 
                 <Button
                   disabled={onSpinner}
-                  onClick={UpdateOrderSeq}
+                  // onClick={UpdateOrderSeq}
                   variant="default"> {!onSpinner ? (`Confirm Update OrderDetails`) : <Spinner className="self-center" />} </Button>
 
               </DetailGrid>

@@ -167,13 +167,13 @@ export const columns: ColumnDef<B2CSaleOrderWithBrand>[] = [
 
 
 
-function ModalB2COrderDetail({ order }: { order: B2CSaleOrderWithBrand }) {
-  if (order)
-    Lgr.info({ data: order }, "ModalB2COrderDetail")
-  return (
-    <span> {order.OrderId} </span>
-  )
-}
+// function ModalB2COrderDetail({ order }: { order: B2CSaleOrderWithBrand }) {
+//   if (order)
+//     Lgr.info({ data: order }, "ModalB2COrderDetail")
+//   return (
+//     <span> {order.OrderId} </span>
+//   )
+// }
 
 const fetcher = async (url: URL): Promise<B2CSaleOrderWithBrand[] | null> => {
   const headCon: RequestInit = {}
