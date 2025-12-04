@@ -64,7 +64,7 @@ export default function NavComponent() {
         },
         {
           name: 'Platform console',
-          href: '/b2c',
+          href: '/platform',
           desc: 'Orgazines your all platform and process works'
         },
 

@@ -1,9 +1,6 @@
 import { IResponse, ResponseHandle } from "@/app/api/utility"
-import { TikTokShopNodeApiClient } from "@/lib/sdk/tiktok"
-import { PrismaClient } from "@prisma/client"
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 
-const prisma = new PrismaClient()
 
 export async function GET(req: NextRequest) {
   // return ResponseHandle.error("data required", "orderawb-tiktok-shop", 400)

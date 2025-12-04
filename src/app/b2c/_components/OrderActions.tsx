@@ -84,7 +84,11 @@ export function OrderActions({ order }: { order: B2CSaleOrderWithBrand }) {
         onOrder={dataGroup}
         onIncreaseOrder={setDateGroup}
       />
-
+      <UpdateOrderDetailsComponentModal
+        order={order}
+        open={openUpdate}
+        onOpenChange={setOpenUpdate}
+      />
       <AddItemsOrderComponentModal
         order={order}
         open={openAddItem}

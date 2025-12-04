@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client"
 import { ResponseHandle } from "@/app/api/utility"
+import prisma from "@/lib/prisma/client"
 
-const prisma = new PrismaClient()
 
 export interface IResShopeeShopList {
   ShopID: string

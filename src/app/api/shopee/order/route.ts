@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { IResShopeeAPI, ResponseHandle, EnumShopee_GetOrderList } from "@/app/api/utility"
 import crypto from "crypto"
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma/client"
 
 
 export interface IResShopee_GetShippingDoc_Struct {
@@ -29,8 +29,6 @@ export interface IResShopee_GetOrderList {
   next_cursor: string
 }
 
-
-const prisma = new PrismaClient()
 
 // new func get order from shopee
 async function ShopeeGetOrderList({ shopID, accessToken, from, to, cursor, status }: { shopID: string, accessToken: string, from?: number, to?: number, cursor?: string, status?: EnumShopee_GetOrderList }) {

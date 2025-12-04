@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
 import { ResponseHandle } from "@/app/api/utility"
 import type ResponseInit from "url"
+import prisma from "@/lib/prisma/client"
 
-const prisma = new PrismaClient()
 
 export interface IResShopeeTokenDetail {
   ShopID: string | undefined

@@ -1,8 +1,8 @@
-import { Prisma, PrismaClient } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { ResponseHandle } from "../utility"
 import { NextRequest } from "next/server"
 import { z } from "zod"
-const prisma = new PrismaClient()
+import prisma from "@/lib/prisma/client"
 
 
 export async function GET(req: NextRequest) {

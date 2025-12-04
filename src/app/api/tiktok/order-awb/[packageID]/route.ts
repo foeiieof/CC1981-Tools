@@ -1,9 +1,9 @@
 import { ResponseHandle } from "@/app/api/utility"
+import prisma from "@/lib/prisma/client"
 import { TikTokShopNodeApiClient } from "@/lib/sdk/tiktok"
-import { Prisma, PrismaClient } from "@prisma/client"
+import { Prisma, } from "@prisma/client"
 import { NextRequest, NextResponse } from "next/server"
 
-const prisma = new PrismaClient()
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ packageID: string }> }) {
   const query = req.nextUrl.searchParams

@@ -2,7 +2,7 @@ import crypto from "crypto"
 
 import { EnumShopee_GetOrderList, IResShopeeAPI, ResponseHandle } from "@/app/api/utility"
 import { NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma/client"
 
 export interface IReqShopeeOrderDetails {
   shop_id: string
@@ -69,7 +69,6 @@ async function FetchShopeeGetOrderWithDetailsList(url: string) {
   }
 }
 
-const prisma = new PrismaClient()
 
 export async function POST(req: NextRequest) {
 

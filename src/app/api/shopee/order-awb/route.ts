@@ -6,10 +6,10 @@ import stream from "stream"
 import archiver from "archiver"
 import axios from "axios"
 import { Prisma, PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma/client"
 
 const pipeline = promisify(stream.pipeline)
 
-const prisma = new PrismaClient()
 
 export async function POST(req: NextRequest) {
 

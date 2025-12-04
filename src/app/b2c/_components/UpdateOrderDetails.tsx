@@ -144,7 +144,7 @@ export default function UpdateOrderDetailsComponentModal({
         {/* Header */}
         <DialogHeader className="sticky top-0 z-20 bg-background border-b px-4 py-2">
           <DialogTitle className="text-lg font-semibold">
-            Seperate Bill — {order.OrderId}
+            Update Order — {order.OrderId}
           </DialogTitle>
           <DialogDescription>
             Make changes to your profile here. Click save when you&apos;re done.

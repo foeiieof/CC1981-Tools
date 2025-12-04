@@ -1,11 +1,10 @@
 import { ResponseHandle } from "../../utility"
 import { Order202309GetOrderListRequestBody, Order202309GetOrderListResponseDataOrders, TikTokShopNodeApiClient } from "@/lib/sdk/tiktok"
-import { PrismaClient } from "@prisma/client";
 import pino from "pino"
 import { HttpError } from "@/lib/sdk/tiktok/api";
 import { EnumTiktokOrderStatus } from "@/app/tiktok/page";
+import prisma from "@/lib/prisma/client";
 
-const prisma = new PrismaClient()
 
 
 const logger = pino({

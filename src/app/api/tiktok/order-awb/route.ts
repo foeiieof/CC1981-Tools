@@ -1,11 +1,10 @@
 import { EnumTiktokOrderStatus, ResponseHandle } from "@/app/api/utility"
+import prisma from "@/lib/prisma/client";
 import { TikTokShopNodeApiClient } from "@/lib/sdk/tiktok";
-import { PrismaClient } from "@prisma/client";
 import { AxiosError } from "axios";
 import crypto from "crypto";
 import { NextRequest } from "next/server";
 
-const prisma = new PrismaClient()
 
 
 export interface IResTiktokOrderInformationAWB {

@@ -1,11 +1,20 @@
-import prisma from "@/lib/prisma/client";
+import { NextRequest } from "next/server";
 import { ResponseHandle } from "../utility";
+import { Prisma } from "@prisma/client"
+import prisma from "@/lib/prisma/client"
 
-export async function GET() {
+
+export async function GET(req: NextRequest) {
+  const param = req.nextUrl.searchParams
+  const channel = param.get("channel") ?? undefined
+
   try {
-    const channels = await prisma.b2C_ChannelTable.findMany()
+    const findConf: Prisma.B2C_ChannelProcessWhereInput = {}
+    if (channel) findConf.ChannelId = Number(channel)
+
+    const channelsProcess = await prisma.b2C_ChannelProcess.findMany({ where: findConf })
     // Bigint -> string
-    const convChannels = channels.map((item) => ({
+    const convChannels = channelsProcess.map((item) => ({
       ...item,
       Partition: item.Partition.toString(),
     }))
@@ -21,11 +30,9 @@ export async function GET() {
   }
   catch (err) {
     return ResponseHandle.error("Cannot Get: Channel table", `${err}`)
-    // return NextResponse.json({ success: false, error: `Cannot fetch : ${err}` })
   }
   finally {
     await prisma.$disconnect()
   }
-  // return ResponseHandle.success("data", "success-channelbrand", 200)
 }
 
